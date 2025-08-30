@@ -9,7 +9,6 @@ import {
   Dimensions,
   Image
 } from 'react-native';
-// this is react native code
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
