@@ -30,6 +30,16 @@ export default function RootLayout() {
           animation: "slide_from_bottom", // ✅ Smooth bottom-to-top animation
         }}
       />
+
+      {/* 360 Screen */}
+      <Stack.Screen
+        name="pano"
+        options={{
+          headerShown: false,
+          presentation: "modal", // ✅ Opens like a modal
+          animation: "slide_from_bottom", // ✅ Smooth bottom-to-top animation
+        }}
+      />
     </Stack>
   );
 }

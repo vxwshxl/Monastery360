@@ -11,7 +11,7 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 const HEADER_HEIGHT = 300;
@@ -40,7 +40,15 @@ const DestinationDetailsPage = () => {
   });
 
   // Reusable TourCard Component
-  const TourCard = ({ title, duration, rating, reviews, image }) => (
+  type TourCardProps = {
+    title: string;
+    duration: string;
+    rating: string;
+    reviews: string;
+    image: any;
+  };
+
+  const TourCard: React.FC<TourCardProps> = ({ title, duration, rating, reviews, image }) => (
     <TouchableOpacity style={styles.tourCard}>
       <Image source={image} style={styles.tourImage} />
       <TouchableOpacity style={styles.tourFavorite}>
@@ -69,10 +77,12 @@ const DestinationDetailsPage = () => {
           { transform: [{ translateY: headerTranslate }] },
         ]}
       >
-        <Animated.Image
-          source={require("../assets/panoramic/p1.jpg")}
-          style={[styles.headerImage, { opacity: imageOpacity }]}
-        />
+          <TouchableOpacity activeOpacity={0.8}>
+            <Animated.Image
+              source={require("../assets/panoramic/p1.jpg")}
+              style={[styles.headerImage, { opacity: imageOpacity }]}
+            />
+          </TouchableOpacity>
         <View style={styles.headerOverlay} />
       </Animated.View>
 
@@ -84,9 +94,11 @@ const DestinationDetailsPage = () => {
         >
           <Ionicons name="chevron-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="heart-outline" size={24} color="#fff" />
-        </TouchableOpacity>
+        <Link href="/pano" asChild>
+          <TouchableOpacity style={styles.headerButton}>
+            <Ionicons name="reload-circle-outline" size={24} color="#fff" />
+          </TouchableOpacity>
+        </Link>
       </SafeAreaView>
 
       {/* Scrollable Content */}
