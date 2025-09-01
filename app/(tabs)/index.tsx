@@ -1,6 +1,7 @@
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, SafeAreaView } from "react-native";
-import React from "react";
 import { Ionicons } from '@expo/vector-icons';
+import React from "react";
+import { Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Link } from "expo-router";
 
 const Page = () => {
   return (
@@ -39,47 +40,51 @@ const Page = () => {
         <Text style={styles.tripTitle}>Select your next trip</Text>
         <View style={styles.tabsContainer}>
           <TouchableOpacity style={styles.tab}>
-            <Text style={styles.tabText}>Asia</Text>
+            <Text style={styles.tabText}>Monastery</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.tab}>
-            <Text style={styles.tabText}>Europe</Text>
+            <Text style={styles.tabText}>Sikkim</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.tab, styles.activeTab]}>
-            <Text style={[styles.tabText, styles.activeTabText]}>South America</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.tab}>
-            <Text style={styles.tabText}>No</Text>
+            <Text style={[styles.tabText, styles.activeTabText]}>Gangtok</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       {/* Card View */}
       <View style={styles.cardContainer}>
-        <TouchableOpacity style={styles.card}>
-          <View style={styles.cardImageContainer}>
-            <Image
-              source={require("../../assets/panoramic/p1.jpg")} // You'll need to add this image
-              style={styles.cardImage}
-            />
-            <TouchableOpacity style={styles.favoriteButton}>
-              <Ionicons name="heart-outline" size={20} color="#333" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.cardContent}>
-            <Text style={styles.cardTitle}>Iconic Brazil</Text>
-            <Text style={styles.cardPrice}>8 days • from $659/person</Text>
-            <View style={styles.cardFooter}>
-              <View style={styles.ratingContainer}>
-                <Ionicons name="star" size={16} color="#FFD700" />
-                <Text style={styles.ratingText}>4.8</Text>
-                <Text style={styles.reviewsText}>56 reviews</Text>
-              </View>
-              <TouchableOpacity style={styles.arrowButton}>
-                <Ionicons name="arrow-forward" size={18} color="#fff" />
+        <Link 
+          href="/destination" 
+          asChild
+        >
+          <TouchableOpacity 
+            style={styles.card}
+          >
+            <View style={styles.cardImageContainer}>
+              <Image
+                source={require("../../assets/panoramic/p1.jpg")} // You'll need to add this image
+                style={styles.cardImage}
+              />
+              <TouchableOpacity style={styles.favoriteButton}>
+                <Ionicons name="heart-outline" size={20} color="#333" />
               </TouchableOpacity>
             </View>
-          </View>
-        </TouchableOpacity>
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>Monastery</Text>
+              <Text style={styles.cardPrice}>1 day • ₹50/person</Text>
+              <View style={styles.cardFooter}>
+                <View style={styles.ratingContainer}>
+                  <Ionicons name="star-outline" size={16} color="#000" />
+                  <Text style={styles.ratingText}>4.8</Text>
+                  <Text style={styles.reviewsText}>56 reviews</Text>
+                </View>
+                <TouchableOpacity style={styles.arrowButton}>
+                  <Ionicons name="arrow-forward" size={18} color="#fff" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </Link>
       </View>
     </SafeAreaView>
   );
@@ -262,7 +267,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cardPrice: {
-    fontSize: 16,
+    fontSize: 15,
     color: "#666",
     marginBottom: 5,
   },
@@ -278,17 +283,18 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   ratingText: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 15,
+    fontWeight: "500",
     color: "#000",
   },
   reviewsText: {
-    fontSize: 14,
+    paddingLeft: 26,
+    fontSize: 15,
     color: "#666",
   },
   arrowButton: {
-    width: 56,
-    height: 56,
+    width: 46,
+    height: 46,
     backgroundColor: "#333",
     borderRadius: 50,
     justifyContent: "center",

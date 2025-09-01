@@ -20,6 +20,16 @@ export default function RootLayout() {
           animation: "fade", // ✅ Smooth fade-in transition
         }}
       />
+
+      {/* Destination Screen */}
+      <Stack.Screen
+        name="destination"
+        options={{
+          headerShown: false,
+          presentation: "modal", // ✅ Opens like a modal
+          animation: "slide_from_bottom", // ✅ Smooth bottom-to-top animation
+        }}
+      />
     </Stack>
   );
 }
