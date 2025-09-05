@@ -7,7 +7,7 @@ const Page = () => {
       <Text style={styles.text}>Explore Screen</Text>
     </View>
   );
-};///
+};
 
 export default Page;
 
