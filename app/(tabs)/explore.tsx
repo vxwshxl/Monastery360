@@ -4,7 +4,7 @@ import React from "react";
 const Page = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Support Screen</Text>
+      <Text style={styles.text}>Explore Screen</Text>
     </View>
   );
 };
