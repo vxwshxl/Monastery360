@@ -54,16 +54,19 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         !isActiveGroup && styles.inactiveGroup
       ]}>
         {isActiveGroup && (
-          <Animated.View style={[
-            animatedStyle,
-            {
-              position: 'absolute',
-              backgroundColor: '#fff',
-              borderRadius: 50,
-              height: 50,
-              width: buttonWidth - 10,
-            }
-          ]} />
+          <Animated.View
+            style={[
+              animatedStyle,
+              {
+                position: 'absolute',
+                backgroundColor: '#fff',
+                borderRadius: 50,
+                height: 50,
+                width: buttonWidth - 10,
+                left: 12,
+              },
+            ]}
+          />
         )}
         
         {groupRoutes.map(({ route, index: routeIndex }) => {
@@ -135,13 +138,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 30,
+    gap: 2,
   },
   tabGroup: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#29292B',
     borderRadius: 30,
-    paddingVertical: 20,
+    paddingVertical: 18,
     paddingHorizontal: 8,
     shadowColor: '#29292B',
     shadowOffset: { width: 0, height: 5 },
@@ -150,12 +154,9 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   sideGroup: {
-    minWidth: 120,
+    width: 130,
   },
   centerGroup: {
-    minWidth: 60,
-  },
-  inactiveGroup: {
-    opacity: 0.8,
+    width: 60,
   },
 })
