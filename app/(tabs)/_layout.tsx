@@ -26,9 +26,9 @@ const TabLayout = () => {
       
       {/* Center Group */}
       <Tabs.Screen 
-        name="support" 
+        name="ar" 
         options={{ 
-          title: 'A.I.',
+          title: 'ar',
           tabBarGroup: 'center'
         }} 
       />

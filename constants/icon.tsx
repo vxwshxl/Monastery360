@@ -10,8 +10,8 @@ export const icon = {
     profile: (props: any) => (
         <Feather name='user' size={24} {...props} />
     ),
-    support: (props: any) => (
-        <Feather name='headphones' size={24} {...props} />
+    ar: (props: any) => (
+        <Feather name='plus' size={24} {...props} />
     ),
     alert: (props: any) => (
         <Feather name='bell' size={24} {...props} />
