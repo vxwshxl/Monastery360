@@ -3,7 +3,7 @@ import React from "react";
 import { Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Link } from "expo-router";
 
-const Page = () => {
+const index = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header Section */}
@@ -90,7 +90,7 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default index;
 
 const styles = StyleSheet.create({
   container: {
