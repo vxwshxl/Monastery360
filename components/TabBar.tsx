@@ -1,7 +1,7 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import React, { useEffect } from 'react';
 import { StyleSheet, View, Dimensions } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import TabBarButton from './TabBarButton';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -12,7 +12,6 @@ const BORDER_RADIUS = 50;
 const GROUP_GAP = 15; // Gap between tab groups
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
-  // Group routes by their tabBarGroup option
   const groupedRoutes = {
     left: [] as Array<{ route: any; index: number }>,
     center: [] as Array<{ route: any; index: number }>,
@@ -25,15 +24,15 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     groupedRoutes[group].push({ route, index });
   });
 
-  // Single animated value for all groups
+  // Animated values
   const indicatorPosition = useSharedValue(0);
+  const tabBarOffset = useSharedValue(0);
 
-  // Calculate dynamic dimensions with gaps
-  const availableWidth = SCREEN_WIDTH - (TAB_BAR_PADDING * 2);
+  const availableWidth = SCREEN_WIDTH - TAB_BAR_PADDING * 2;
   const centerGroupWidth = groupedRoutes.center.length > 0 ? 60 : 0;
-  const totalGapWidth = groupedRoutes.center.length > 0 ? GROUP_GAP * 2 : 0; // Gaps on both sides of center
+  const totalGapWidth = groupedRoutes.center.length > 0 ? GROUP_GAP * 2 : 0;
   const sideGroupWidth = (availableWidth - centerGroupWidth - totalGapWidth) / 2;
-  
+
   const getGroupWidth = (groupKey: keyof typeof groupedRoutes) => {
     if (groupKey === 'center') return centerGroupWidth;
     return sideGroupWidth;
@@ -46,31 +45,42 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     return (groupWidth - TAB_GROUP_PADDING * 2) / routeCount;
   };
 
-  // Update indicator position when active tab changes
   useEffect(() => {
     const activeRoute = state.routes[state.index];
     const { options } = descriptors[activeRoute.key];
     const activeGroup = (options.tabBarGroup || 'left') as keyof typeof groupedRoutes;
-    
+
+    // 👇 Slide down when on explore
+    if (activeRoute.name === 'explore') {
+      tabBarOffset.value = withTiming(100, { duration: 300 });
+    } else {
+      tabBarOffset.value = withTiming(0, { duration: 300 });
+    }
+
     if (activeGroup !== 'center') {
       const groupRoutes = groupedRoutes[activeGroup];
       const positionInGroup = groupRoutes.findIndex(item => item.index === state.index);
       const buttonWidth = getButtonWidth(activeGroup);
       const buttonX = buttonWidth * positionInGroup;
-      
-      indicatorPosition.value = withSpring(buttonX, { 
+
+      indicatorPosition.value = withSpring(buttonX, {
         damping: 20,
-        stiffness: 300
+        stiffness: 300,
       });
     }
   }, [state.index]);
 
+  // 🔥 Only slide down, no fade
+  const animatedTabBarStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: tabBarOffset.value }],
+  }));
+
   const renderTabGroup = (
-    groupRoutes: Array<{ route: any; index: number }>, 
+    groupRoutes: Array<{ route: any; index: number }>,
     groupKey: keyof typeof groupedRoutes
   ) => {
     if (groupRoutes.length === 0) return null;
-    
+
     const isActiveGroup = groupRoutes.some(item => item.index === state.index);
     const groupWidth = getGroupWidth(groupKey);
     const buttonWidth = getButtonWidth(groupKey);
@@ -79,9 +89,8 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
       transform: [{ translateX: indicatorPosition.value }]
     }));
 
-    // ✅ If center group -> circle with indicator
-    if (groupKey === "center") {
-      const SIZE = 70; // diameter of circle tab
+    if (groupKey === 'center') {
+      const SIZE = 70;
       return (
         <View style={{ width: SIZE, height: SIZE, alignItems: "center", justifyContent: "center" }}>
           <View
@@ -100,7 +109,6 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
               position: 'relative',
             }}
           >
-            {/* White indicator for center group */}
             {isActiveGroup && (
               <View
                 style={{
@@ -109,15 +117,10 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                   height: SIZE - 16,
                   borderRadius: (SIZE - 16) / 2,
                   backgroundColor: '#fff',
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowRadius: 4,
-                  shadowOpacity: 0.1,
-                  elevation: 2,
                 }}
               />
             )}
-            
+
             {groupRoutes.map(({ route, index: routeIndex }) => {
               const { options } = descriptors[route.key];
               const isFocused = state.index === routeIndex;
@@ -157,36 +160,23 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
       );
     }
 
-    // ✅ Default pill style for left & right groups
-    const SIZE = 70; // diameter of circle tab
+    const SIZE = 70;
     return (
-      <View style={[
-        styles.tabGroup,
-        { 
-          width: groupWidth,
-        }
-      ]}>
+      <View style={[styles.tabGroup, { width: groupWidth }]}>
         {isActiveGroup && (
           <Animated.View
             style={[
               styles.indicator,
               animatedStyle,
               {
-                position: 'absolute',
                 width: SIZE - 16,
                 height: SIZE - 16,
                 borderRadius: (SIZE - 16) / 2,
-                backgroundColor: '#fff',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowRadius: 4,
-                shadowOpacity: 0.1,
-                elevation: 2,
               }
             ]}
           />
         )}
-        
+
         {groupRoutes.map(({ route, index: routeIndex }) => {
           const { options } = descriptors[route.key];
           const isFocused = state.index === routeIndex;
@@ -227,26 +217,23 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, animatedTabBarStyle]}>
       <View style={styles.tabBarContainer}>
-        {/* Left Group */}
         <View style={[styles.sideContainer, { marginRight: groupedRoutes.center.length > 0 ? GROUP_GAP : 0 }]}>
           {renderTabGroup(groupedRoutes.left, 'left')}
         </View>
-        
-        {/* Center Group */}
+
         {groupedRoutes.center.length > 0 && (
           <View style={styles.centerContainer}>
             {renderTabGroup(groupedRoutes.center, 'center')}
           </View>
         )}
-        
-        {/* Right Group */}
+
         <View style={[styles.sideContainer, { marginLeft: groupedRoutes.center.length > 0 ? GROUP_GAP : 0 }]}>
           {renderTabGroup(groupedRoutes.right, 'right')}
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -261,12 +248,11 @@ const styles = StyleSheet.create({
   tabBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center', // Changed from 'space-evenly' to 'center' for better control
+    justifyContent: 'center',
     width: SCREEN_WIDTH,
     paddingHorizontal: TAB_BAR_PADDING,
   },
   sideContainer: {
-    // Removed flex: 1 to prevent stretching, let natural width take effect
     alignItems: 'center',
   },
   centerContainer: {
@@ -291,12 +277,6 @@ const styles = StyleSheet.create({
   indicator: {
     position: 'absolute',
     backgroundColor: '#fff',
-    borderRadius: BORDER_RADIUS - 4,
     left: TAB_GROUP_PADDING,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    shadowOpacity: 0.1,
-    elevation: 2,
   },
 });
