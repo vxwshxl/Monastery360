@@ -201,10 +201,10 @@ export default function App() {
               onPress={() => handleLocationPress(marker, index)}
             >
               <View style={styles.locationInfo}>
-                <Text style={styles.locationName}>{marker.name}</Text>
-                <Text style={styles.locationDescription} numberOfLines={2}>
+                <BoldText style={styles.locationName}>{marker.name}</BoldText>
+                <BoldText style={styles.locationDescription} numberOfLines={2}>
                   {marker.description}
-                </Text>
+                </BoldText>
               </View>
               <Image
                 source={{ uri: marker.image }}

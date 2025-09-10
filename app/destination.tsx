@@ -39,35 +39,6 @@ const DestinationDetailsPage = () => {
     extrapolate: "clamp",
   });
 
-  // Reusable TourCard Component
-  type TourCardProps = {
-    title: string;
-    duration: string;
-    rating: string;
-    reviews: string;
-    image: any;
-  };
-
-  const TourCard: React.FC<TourCardProps> = ({ title, duration, rating, reviews, image }) => (
-    <TouchableOpacity style={styles.tourCard}>
-      <Image source={image} style={styles.tourImage} />
-      <TouchableOpacity style={styles.tourFavorite}>
-        <Ionicons name="heart-outline" size={16} color="#333" />
-      </TouchableOpacity>
-      <View style={styles.tourInfo}>
-        <Text style={styles.tourTitle}>{title}</Text>
-        <Text style={styles.tourDuration}>{duration}</Text>
-        <View style={styles.tourFooter}>
-          <View style={styles.tourRating}>
-            <Ionicons name="star" size={12} color="#FFD700" />
-            <Text style={styles.tourRatingText}>{rating}</Text>
-            <Text style={styles.tourReviews}>{reviews} reviews</Text>
-          </View>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-
   return (
     <View style={styles.container}>
       {/* Parallax Header */}
@@ -77,13 +48,18 @@ const DestinationDetailsPage = () => {
           { transform: [{ translateY: headerTranslate }] },
         ]}
       >
-          <TouchableOpacity activeOpacity={0.8}>
-            <Animated.Image
-              source={require("../assets/panoramic/p1.jpg")}
-              style={[styles.headerImage, { opacity: imageOpacity }]}
-            />
-          </TouchableOpacity>
+        <TouchableOpacity activeOpacity={0.8}>
+          <Animated.Image
+            source={require("../assets/panoramic/p1.jpg")}
+            style={[styles.headerImage, { opacity: imageOpacity }]}
+          />
+        </TouchableOpacity>
         <View style={styles.headerOverlay} />
+        
+        {/* Image counter badge */}
+        <View style={styles.imageCounterBadge}>
+          <Text style={styles.imageCounterText}>1/29</Text>
+        </View>
       </Animated.View>
 
       {/* Header Controls */}
@@ -92,104 +68,121 @@ const DestinationDetailsPage = () => {
           style={styles.headerButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="chevron-back" size={24} color="#fff" />
+          <Ionicons name="chevron-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Link href="/pano" asChild>
+        
+        <View style={styles.rightControls}>
           <TouchableOpacity style={styles.headerButton}>
-            <Ionicons name="reload-circle-outline" size={24} color="#fff" />
+            <Ionicons name="share-outline" size={20} color="#333" />
           </TouchableOpacity>
-        </Link>
-      </SafeAreaView>
-
-      {/* Scrollable Content */}
-      <Animated.ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
-        scrollEventThrottle={16}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Spacer for Parallax Header */}
-        <View style={styles.headerSpacer} />
-
-        {/* Content Card */}
-        <View style={styles.contentCard}>
-          {/* Destination Info */}
-          <Animated.View
-            style={[
-              styles.destinationHeader,
-              { transform: [{ scale: titleScale }] },
-            ]}
-          >
-            <View style={styles.titleRow}>
-              <Text style={styles.destinationTitle}>Rio de Janeiro</Text>
-              <View style={styles.ratingBadge}>
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Text style={styles.ratingText}>5.0</Text>
-              </View>
-            </View>
-            <View style={styles.locationRow}>
-              <View style={styles.locationBadge}>
-                <Text style={styles.locationText}>Brazil</Text>
-              </View>
-              <Text style={styles.reviewsText}>143 reviews</Text>
-            </View>
-          </Animated.View>
-
-          {/* Description */}
-          <View style={styles.descriptionSection}>
-            <Text style={styles.descriptionText}>
-              Rio de Janeiro, often simply called Rio, is one of Brazil's most
-              iconic cities, renowned for its stunning beaches, vibrant culture,
-              and breathtaking landscapes.
-            </Text>
-            <TouchableOpacity>
-              <Text style={styles.readMoreText}>Read more</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Upcoming Tours */}
-          <View style={styles.toursSection}>
-            <View style={styles.toursSectionHeader}>
-              <Text style={styles.toursTitle}>Upcoming tours</Text>
-              <TouchableOpacity>
-                <Text style={styles.seeAllText}>See all</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Horizontal Tour Cards */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.toursList}
-            >
-              <TourCard
-                title="Iconic Brazil"
-                duration="5 days • from $500/person"
-                rating="4.6"
-                reviews="48"
-                image={require("../assets/panoramic/p1.jpg")}
-              />
-              <TourCard
-                title="Beach Paradise"
-                duration="3 days • from $300/person"
-                rating="4.8"
-                reviews="72"
-                image={require("../assets/panoramic/p1.jpg")}
-              />
-            </ScrollView>
-          </View>
-
-          {/* Book Now Button */}
-          <TouchableOpacity style={styles.bookButton}>
-            <Text style={styles.bookButtonText}>Book Now</Text>
-            <Ionicons name="arrow-forward" size={20} color="#fff" />
+          <TouchableOpacity style={styles.headerButton}>
+            <Ionicons name="heart-outline" size={20} color="#333" />
           </TouchableOpacity>
         </View>
-      </Animated.ScrollView>
+      </SafeAreaView>
+
+      {/* 360 Button */}
+      <Link href="/pano" asChild>
+        <TouchableOpacity style={styles.button360}>
+          <Ionicons name="reload-circle-outline" size={20} color="#333" />
+          <Text style={styles.button360Text}>360°</Text>
+        </TouchableOpacity>
+      </Link>
+
+      {/* Scrollable Content */}
+      <View style={styles.contentContainer}>
+        <Animated.ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true }
+          )}
+          scrollEventThrottle={16}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Spacer for Parallax Header */}
+          <View style={styles.headerSpacer} />
+
+          {/* Content Card */}
+          <View style={styles.contentCard}>
+            {/* Property Info */}
+            <Animated.View
+              style={[
+                styles.propertyHeader,
+                { transform: [{ scale: titleScale }] },
+              ]}
+            >
+              <Text style={styles.propertyTitle}>HillCrest - Golden Horizon</Text>
+              <Text style={styles.locationText}>Room in Shillong, India</Text>
+              <Text style={styles.propertyDetails}>1 bed · Private attached bathroom</Text>
+            </Animated.View>
+
+            {/* Rating and Reviews */}
+            <View style={styles.ratingSection}>
+              <View style={styles.ratingItem}>
+                <Text style={styles.ratingNumber}>4.98</Text>
+                <View style={styles.stars}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Ionicons key={star} name="star" size={12} color="#FFD700" />
+                  ))}
+                </View>
+              </View>
+              
+              <View style={styles.ratingItem}>
+                <Text style={styles.ratingNumber}>55</Text>
+                <Text style={styles.ratingLabel}>Reviews</Text>
+              </View>
+            </View>
+
+            {/* Adderess Info */}
+            <View style={styles.addressSection}>
+              <Image 
+                source={require("../assets/panoramic/p1.jpg")} 
+                style={styles.addressAvatar} 
+              />
+              <View style={styles.addressInfo}>
+                <Text style={styles.addressName}>addressed by Roma Singh</Text>
+                <Text style={styles.addressDetails}>Superaddress · 2 years addressing</Text>
+              </View>
+            </View>
+
+            {/* Features */}
+            <View style={styles.featuresSection}>
+              <View style={styles.feature}>
+                <Ionicons name="checkmark-circle-outline" size={24} color="#333" />
+                <View style={styles.featureText}>
+                  <Text style={styles.featureTitle}>Great check-in experience</Text>
+                  <Text style={styles.featureDescription}>Recent guests loved the smooth start to this stay.</Text>
+                </View>
+              </View>
+              
+              <View style={styles.feature}>
+                <Ionicons name="home-outline" size={24} color="#333" />
+                <View style={styles.featureText}>
+                  <Text style={styles.featureTitle}>Room in a home</Text>
+                  <Text style={styles.featureDescription}>Your own room in a home, plus access to shared spaces.</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Add extra space for fixed bottom section */}
+            <View style={styles.bottomSpacing} />
+          </View>
+        </Animated.ScrollView>
+
+        {/* Fixed Pricing and Reserve Section */}
+        <View style={styles.fixedBottomSection}>
+          <View style={styles.pricingInfo}>
+            <Text style={styles.price}>₹5,706</Text>
+            <Text style={styles.priceDetails}>For 2 nights · 12-14 Sept</Text>
+          </View>
+          
+          <TouchableOpacity style={styles.reserveButton}>
+            <Text style={styles.reserveButtonText}>Reserve</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 };
@@ -218,7 +211,7 @@ const styles = StyleSheet.create({
   },
   headerOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.3)",
+    backgroundColor: "rgba(0,0,0,0.1)",
   },
   headerControls: {
     position: "absolute",
@@ -233,22 +226,73 @@ const styles = StyleSheet.create({
     margin: 10,
     zIndex: 3,
   },
+  rightControls: {
+    flexDirection: "row",
+    gap: 10,
+  },
   headerButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: "rgba(0,0,0,0.3)",
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  button360: {
+    position: "absolute",
+    bottom: 120,
+    right: 20,
+    backgroundColor: "rgba(255,255,255,0.95)",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 4,
+    zIndex: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  button360Text: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#333",
+  },
+  imageCounterBadge: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  imageCounterText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "500",
   },
 
+  /** Content Container */
+  contentContainer: {
+    flex: 1,
+  },
+  
   /** Scroll */
   scrollView: {
     flex: 1,
     zIndex: 2,
   },
   scrollContent: {
-    paddingBottom: 30,
+    paddingBottom: 100, // Space for fixed bottom section
   },
   headerSpacer: {
     height: HEADER_HEIGHT - 50,
@@ -257,185 +301,160 @@ const styles = StyleSheet.create({
   /** Content Card */
   contentCard: {
     backgroundColor: "#fff",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingHorizontal: 20,
-    paddingTop: 30,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 24,
+    paddingTop: 24,
     marginTop: -20,
   },
 
-  /** Destination Info */
-  destinationHeader: {
-    marginBottom: 20,
+  /** Property Info */
+  propertyHeader: {
+    marginBottom: 12,
   },
-  titleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  destinationTitle: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#000",
-  },
-  ratingBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f0f0f0",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 15,
-    gap: 4,
-  },
-  ratingText: {
-    fontSize: 14,
+  propertyTitle: {
+    textAlign: "center",
+    fontSize: 24,
     fontWeight: "600",
-    color: "#000",
-  },
-  locationRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  locationBadge: {
-    backgroundColor: "#e8f5e8",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
+    color: "#222",
+    marginBottom: 4,
   },
   locationText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#4CAF50",
+    textAlign: "center",
+    fontSize: 16,
+    color: "#717171",
+    marginBottom: 2,
   },
-  reviewsText: {
-    fontSize: 14,
-    color: "#666",
+  propertyDetails: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "#717171",
   },
 
-  /** Description */
-  descriptionSection: {
-    marginBottom: 30,
-  },
-  descriptionText: {
-    fontSize: 16,
-    color: "#666",
-    lineHeight: 24,
-    marginBottom: 10,
-  },
-  readMoreText: {
-    fontSize: 16,
-    color: "#007AFF",
-    fontWeight: "500",
-  },
-
-  /** Tours Section */
-  toursSection: {
-    marginBottom: 30,
-  },
-  toursSectionHeader: {
+  /** Rating Section */
+  ratingSection: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    justifyContent: "space-evenly",
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EBEBEB",
   },
-  toursTitle: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#000",
-  },
-  seeAllText: {
-    fontSize: 16,
-    color: "#007AFF",
-    fontWeight: "500",
-  },
-  toursList: {
-    paddingRight: 20,
-  },
-
-  /** Tour Card */
-  tourCard: {
-    width: 280,
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    marginRight: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    overflow: "hidden",
-  },
-  tourImage: {
-    width: "100%",
-    height: 150,
-    resizeMode: "cover",
-  },
-  tourFavorite: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    width: 32,
-    height: 32,
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    justifyContent: "center",
+  ratingItem: {
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
-  tourInfo: {
-    padding: 15,
-  },
-  tourTitle: {
+  ratingNumber: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#000",
-    marginBottom: 5,
+    color: "#222",
+    marginBottom: 2,
   },
-  tourDuration: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 10,
-  },
-  tourFooter: {
+  stars: {
     flexDirection: "row",
-    alignItems: "center",
+    gap: 2,
   },
-  tourRating: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  tourRatingText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#000",
-  },
-  tourReviews: {
+  ratingLabel: {
     fontSize: 12,
-    color: "#666",
-    marginLeft: 4,
+    color: "#717171",
+    textAlign: "center",
   },
 
-  /** Book Button */
-  bookButton: {
-    backgroundColor: "#000",
+  /** Address Section */
+  addressSection: {
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
     paddingVertical: 16,
-    borderRadius: 25,
-    gap: 10,
-    marginTop: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EBEBEB",
+    marginBottom: 24,
   },
-  bookButtonText: {
-    fontSize: 18,
+  addressAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    marginRight: 16,
+  },
+  addressInfo: {
+    flex: 1,
+  },
+  addressName: {
+    fontSize: 16,
     fontWeight: "600",
+    color: "#222",
+    marginBottom: 2,
+  },
+  addressDetails: {
+    fontSize: 14,
+    color: "#717171",
+  },
+
+  /** Features Section */
+  featuresSection: {
+    gap: 24,
+    marginBottom: 24,
+  },
+  feature: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  featureText: {
+    flex: 1,
+    marginLeft: 16,
+  },
+  featureTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#222",
+    marginBottom: 4,
+  },
+  featureDescription: {
+    fontSize: 14,
+    color: "#717171",
+    lineHeight: 18,
+  },
+
+  /** Bottom Spacing */
+  bottomSpacing: {
+    height: 40,
+  },
+
+  /** Fixed Bottom Section */
+  fixedBottomSection: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#EBEBEB",
+    zIndex: 4,
+  },
+  pricingInfo: {
+    flex: 1,
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#222",
+  },
+  priceDetails: {
+    fontSize: 14,
+    color: "#717171",
+  },
+  reserveButton: {
+    backgroundColor: "#E51E53",
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  reserveButtonText: {
     color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
