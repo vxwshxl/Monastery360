@@ -8,7 +8,7 @@ const markers = [
       longitudeDelta: 0.1,
     },
     description: "The largest and most famous monastery in Sikkim, seat of the Karmapa.",
-    image: "https://upload.wikimedia.org/wikipedia/commons/3/3b/Rumtek_Monastery%2C_Sikkim.jpg",
+    image: "https://www.tourmyindia.com/states/sikkim/images/pemayangtse-monastery1.jpg",
   },
   {
     name: "Pemayangtse Monastery",
@@ -19,7 +19,7 @@ const markers = [
       longitudeDelta: 0.1,
     },
     description: "One of the oldest Nyingma monasteries, near Pelling, known for its ancient architecture.",
-    image: "https://upload.wikimedia.org/wikipedia/commons/2/25/Pemayangtse_Monastery%2C_Pelling%2C_Sikkim.jpg",
+    image: "https://www.tourmyindia.com/states/sikkim/images/pemayangtse-monastery1.jpg",
   },
   {
     name: "Enchey Monastery",
@@ -30,7 +30,7 @@ const markers = [
       longitudeDelta: 0.1,
     },
     description: "A 200-year-old monastery overlooking Gangtok, associated with the Nyingma sect.",
-    image: "https://upload.wikimedia.org/wikipedia/commons/e/e6/Enchey_Monastery%2C_Gangtok%2C_Sikkim.jpg",
+    image: "https://www.tourmyindia.com/states/sikkim/images/pemayangtse-monastery1.jpg",
   },
   {
     name: "Tashiding Monastery",
@@ -41,7 +41,7 @@ const markers = [
       longitudeDelta: 0.1,
     },
     description: "A sacred monastery on a hilltop, famous for the Bumchu festival.",
-    image: "https://upload.wikimedia.org/wikipedia/commons/0/0e/Tashiding_Monastery%2C_Sikkim.jpg",
+    image: "https://www.tourmyindia.com/states/sikkim/images/pemayangtse-monastery1.jpg",
   },
   {
     name: "Phodong Monastery",
@@ -52,7 +52,7 @@ const markers = [
       longitudeDelta: 0.1,
     },
     description: "An important Kagyu monastery with ancient murals and annual cham dances.",
-    image: "https://upload.wikimedia.org/wikipedia/commons/9/97/Phodong_Monastery%2C_Sikkim.jpg",
+    image: "https://www.tourmyindia.com/states/sikkim/images/pemayangtse-monastery1.jpg",
   },
   {
     name: "Ralang Monastery",
@@ -63,7 +63,7 @@ const markers = [
       longitudeDelta: 0.1,
     },
     description: "Kagyu monastery near Ravangla, famous for Pang Lhabsol festival.",
-    image: "https://upload.wikimedia.org/wikipedia/commons/0/0f/Ralang_Monastery%2C_Sikkim.jpg",
+    image: "https://www.tourmyindia.com/states/sikkim/images/pemayangtse-monastery1.jpg",
   },
   {
     name: "Dubdi Monastery",
@@ -74,7 +74,7 @@ const markers = [
       longitudeDelta: 0.1,
     },
     description: "Often considered the oldest monastery in Sikkim, built in 1701 near Yuksom.",
-    image: "https://upload.wikimedia.org/wikipedia/commons/2/26/Dubdi_Monastery%2C_Yuksom%2C_Sikkim.jpg",
+    image: "https://www.tourmyindia.com/states/sikkim/images/pemayangtse-monastery1.jpg",
   },
   {
     name: "Sanga Choeling Monastery",
@@ -85,7 +85,7 @@ const markers = [
       longitudeDelta: 0.1,
     },
     description: "One of the oldest monasteries, located on a ridge above Pelling.",
-    image: "https://upload.wikimedia.org/wikipedia/commons/4/41/Sanga_Choling_Monastery%2C_Pelling%2C_Sikkim.jpg",
+    image: "https://www.tourmyindia.com/states/sikkim/images/pemayangtse-monastery1.jpg",
   },
   {
     name: "Lingdum (Ranka) Monastery",
@@ -96,7 +96,7 @@ const markers = [
       longitudeDelta: 0.1,
     },
     description: "A large, modern monastery near Gangtok, popular with visitors and film shoots.",
-    image: "https://upload.wikimedia.org/wikipedia/commons/f/f0/Lingdum_Monastery%2C_Gangtok%2C_Sikkim.jpg",
+    image: "https://www.tourmyindia.com/states/sikkim/images/pemayangtse-monastery1.jpg",
   },
   {
     name: "Kartok Monastery",
@@ -107,7 +107,7 @@ const markers = [
       longitudeDelta: 0.1,
     },
     description: "Historic monastery in Yuksom near Kartok Lake, linked with Sikkim's founding.",
-    image: "https://upload.wikimedia.org/wikipedia/commons/b/b6/Kartok_Monastery%2C_Yuksom%2C_Sikkim.jpg",
+    image: "https://www.tourmyindia.com/states/sikkim/images/pemayangtse-monastery1.jpg",
   },
 ];
 

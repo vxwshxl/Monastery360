@@ -3,14 +3,20 @@ import React from "react";
 import { Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Link } from "expo-router";
 
+// FONTS
+import LightText from '@/assets/fonts/LightText';
+import MediumText from '@/assets/fonts/MediumText';
+import BoldText from '@/assets/fonts/BoldText';
+
 const index = () => {
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={styles.greeting}>Hello User,</Text>
-          <Text style={styles.welcome}>Welcome to Monastery360</Text>
+          <BoldText style={styles.greeting}>Hello User,</BoldText>
+          <MediumText style={styles.welcome}>Welcome to Monastery360</MediumText>
         </View>
         <View style={styles.profileContainer}>
           <Image
@@ -37,16 +43,16 @@ const index = () => {
 
       {/* Trip Selection */}
       <View style={styles.tripSection}>
-        <Text style={styles.tripTitle}>Select your next trip</Text>
+        <BoldText style={styles.tripTitle}>Select your next trip</BoldText>
         <View style={styles.tabsContainer}>
           <TouchableOpacity style={styles.tab}>
-            <Text style={styles.tabText}>Monastery</Text>
+            <LightText style={styles.tabText}>Monastery</LightText>
           </TouchableOpacity>
           <TouchableOpacity style={styles.tab}>
-            <Text style={styles.tabText}>Sikkim</Text>
+            <LightText style={styles.tabText}>Sikkim</LightText>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.tab, styles.activeTab]}>
-            <Text style={[styles.tabText, styles.activeTabText]}>Gangtok</Text>
+            <LightText style={[styles.tabText, styles.activeTabText]}>Gangtok</LightText>
           </TouchableOpacity>
         </View>
       </View>
@@ -70,13 +76,13 @@ const index = () => {
               </TouchableOpacity>
             </View>
             <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>Monastery</Text>
-              <Text style={styles.cardPrice}>1 day • ₹50/person</Text>
+              <BoldText style={styles.cardTitle}>Monastery</BoldText>
+              <LightText style={styles.cardPrice}>1 day • ₹50/person</LightText>
               <View style={styles.cardFooter}>
                 <View style={styles.ratingContainer}>
                   <Ionicons name="star-outline" size={16} color="#000" />
-                  <Text style={styles.ratingText}>4.8</Text>
-                  <Text style={styles.reviewsText}>56 reviews</Text>
+                  <BoldText style={styles.ratingText}>4.8</BoldText>
+                  <LightText style={styles.reviewsText}>56 reviews</LightText>
                 </View>
                 <TouchableOpacity style={styles.arrowButton}>
                   <Ionicons name="arrow-forward" size={18} color="#fff" />

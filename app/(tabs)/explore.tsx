@@ -15,6 +15,11 @@ import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import { Feather } from '@expo/vector-icons';
 import markers from '../../components/markers';
 
+// FONTS
+import LightText from '@/assets/fonts/LightText';
+import MediumText from '@/assets/fonts/MediumText';
+import BoldText from '@/assets/fonts/BoldText';
+
 const { height: screenHeight } = Dimensions.get('window');
 
 export default function App() {
@@ -178,7 +183,7 @@ export default function App() {
         </View>
 
         <View style={styles.listHeader}>
-          <Text style={styles.listTitle}>All Monasteries</Text>
+          <BoldText style={styles.listTitle}>All Monasteries</BoldText>
         </View>
 
         <ScrollView
