@@ -1,21 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from "react";
-import { Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView } from "react-native";
-import { Link } from "expo-router";
-import { LinearGradient } from 'expo-linear-gradient';
-
+import React, { useState } from "react";
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, ScrollView, TextInput } from "react-native";
 import Monastery from '../../components/monastery';
 
 // FONTS
-import LightText from '@/assets/fonts/LightText';
-import MediumText from '@/assets/fonts/MediumText';
 import BoldText from '@/assets/fonts/BoldText';
 
-const index = () => {
+const Index = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header Section - Updated */}
+        {/* Header Section */}
         <View style={styles.header}>
           {/* Navigation Tabs */}
           <View style={styles.navigationTabs}>
@@ -44,23 +41,30 @@ const index = () => {
           </View>
           
           {/* Search Bar */}
-          <TouchableOpacity style={styles.searchButton}>
+          <View style={styles.searchButton}>
             <Ionicons name="search" size={25} color="#999" />
-            <BoldText style={styles.searchPlaceholder}>Start your search</BoldText>
+            <TextInput
+              style={styles.searchPlaceholder}
+              placeholder="Start your search"
+              placeholderTextColor="#999"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
             <TouchableOpacity style={styles.filterButton}>
               <Ionicons name="options" size={20} color="#fff" />
             </TouchableOpacity>
-          </TouchableOpacity>
+          </View>
         </View>
 
-        <Monastery />
+        {/* Pass Search Query */}
+        <Monastery searchQuery={searchQuery} />
 
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-export default index;
+export default Index;
 
 const styles = StyleSheet.create({
   container: {

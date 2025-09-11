@@ -60,6 +60,13 @@ const DestinationDetailsPage = () => {
     extrapolate: "clamp",
   });
 
+  const getRandomTimeAgo = () => {
+    const daysAgo = Math.floor(Math.random() * 30) + 1;
+    if (daysAgo < 7) return `${daysAgo} day${daysAgo > 1 ? "s" : ""} ago`;
+    const weeks = Math.floor(daysAgo / 7);
+    return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+  };
+
   if (loading || !monasteryData) {
     return (
       <View style={styles.loadingContainer}>
@@ -268,6 +275,100 @@ const DestinationDetailsPage = () => {
                   <Text style={styles.infoText}>Photography allowed in most areas, ask permission inside halls</Text>
                 </View>
               </View>
+            </View>
+
+            {/* Reviews Section */}
+            <View style={styles.reviewsSection}>
+              {/* Visitor Favourite Badge */}
+              <View style={styles.guestFavouriteContainer}>
+                <View style={styles.laurelContainer}>
+                  <Text style={styles.laurelLeft}>🏯</Text>
+                  <Text style={styles.ratingLarge}>{monasteryData.rating.toFixed(2)}</Text>
+                  <Text style={styles.laurelRight}>🏯</Text>
+                </View>
+                <Text style={styles.guestFavouriteTitle}>Visitor Favourite</Text>
+                <Text style={styles.guestFavouriteSubtitle}>
+                  This monastery is among the <Text style={styles.boldText}>top rated</Text> spiritual sites
+                </Text>
+                <Text style={styles.guestFavouriteSubtitle}>
+                  Appreciated for its atmosphere, heritage, and serenity
+                </Text>
+              </View>
+
+              {/* Rating Categories */}
+              <View style={styles.ratingCategories}>
+                <View style={styles.categoryRow}>
+                  <Text style={styles.categoryLabel}>Spiritual Atmosphere</Text>
+                  <View style={styles.categoryRating}>
+                    <View style={styles.ratingBar}>
+                      <View style={[styles.ratingFill, { width: '100%' }]} />
+                    </View>
+                  </View>
+                </View>
+
+                <View style={styles.categoryRow}>
+                  <Text style={styles.categoryLabel}>Scenic Views</Text>
+                  <View style={styles.categoryRating}>
+                    <View style={styles.ratingBar}>
+                      <View style={[styles.ratingFill, { width: '97%' }]} />
+                    </View>
+                  </View>
+                </View>
+
+                <View style={styles.categoryRow}>
+                  <Text style={styles.categoryLabel}>Cultural Significance</Text>
+                  <View style={styles.categoryRating}>
+                    <View style={styles.ratingBar}>
+                      <View style={[styles.ratingFill, { width: '95%' }]} />
+                    </View>
+                  </View>
+                </View>
+
+                <View style={styles.categoryRow}>
+                  <Text style={styles.categoryLabel}>Peace & Tranquility</Text>
+                  <View style={styles.categoryRating}>
+                    <View style={styles.ratingBar}>
+                      <View style={[styles.ratingFill, { width: '99%' }]} />
+                    </View>
+                  </View>
+                </View>
+              </View>
+
+              {/* Individual Reviews */}
+              <View style={styles.reviewsContainer}>
+                {monasteryData.reviews && monasteryData.reviews.map((review, index) => (
+                  <View key={index} style={styles.reviewItem}>
+                    <View style={styles.reviewStars}>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Ionicons key={star} name="star" size={12} color="#FFD700" />
+                      ))}
+                      <Text style={styles.reviewDate}>{getRandomTimeAgo()}</Text>
+                    </View>
+                    <Text style={styles.reviewText}>{review.review}</Text>
+                    <TouchableOpacity>
+                      <Text style={styles.showMoreText}>Show more</Text>
+                    </TouchableOpacity>
+                    <View style={styles.reviewerInfo}>
+                      <View style={styles.reviewerAvatar}>
+                        <Text style={styles.avatarText}>
+                          {review.name.charAt(0)}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text style={styles.reviewerName}>{review.name}</Text>
+                        <Text style={styles.reviewerDetails}>
+                          {Math.floor(Math.random() * 10) + 1} years on platform
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                ))}
+              </View>
+
+              {/* Show All Reviews Button */}
+              <TouchableOpacity style={styles.showAllReviewsButton}>
+                <Text style={styles.showAllReviewsText}>Show all 48 reviews</Text>
+              </TouchableOpacity>
             </View>
 
             {/* Add extra space for fixed bottom section */}
@@ -540,6 +641,8 @@ const styles = StyleSheet.create({
   /** Visiting Information Section */
   visitingSection: {
     paddingVertical: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EBEBEB",
   },
   infoRow: {
     flexDirection: 'row',
@@ -560,6 +663,151 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#717171',
     lineHeight: 20,
+  },
+
+  /** Reviews Section */
+  reviewsSection: {
+    paddingVertical: 24,
+  },
+  guestFavouriteContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
+    paddingVertical: 20,
+  },
+  laurelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 8,
+  },
+  laurelLeft: {
+    fontSize: 24,
+  },
+  ratingLarge: {
+    fontSize: 48,
+    fontWeight: '600',
+    color: '#222',
+  },
+  laurelRight: {
+    fontSize: 24,
+  },
+  guestFavouriteTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#222',
+    marginBottom: 8,
+  },
+  guestFavouriteSubtitle: {
+    fontSize: 14,
+    color: '#717171',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  boldText: {
+    fontWeight: '600',
+    color: '#222',
+  },
+  ratingCategories: {
+    marginBottom: 32,
+  },
+  categoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  categoryLabel: {
+    fontSize: 16,
+    color: '#222',
+    flex: 1,
+  },
+  categoryRating: {
+    flex: 1,
+    marginLeft: 20,
+  },
+  ratingBar: {
+    height: 4,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  ratingFill: {
+    height: '100%',
+    backgroundColor: '#222',
+  },
+  reviewsContainer: {
+    marginBottom: 24,
+  },
+  reviewItem: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EBEBEB"
+  },
+  reviewStars: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    gap: 2,
+  },
+  reviewDate: {
+    fontSize: 12,
+    color: '#717171',
+    marginLeft: 8,
+  },
+  reviewText: {
+    fontSize: 16,
+    color: '#222',
+    lineHeight: 24,
+    marginBottom: 8,
+  },
+  showMoreText: {
+    fontSize: 16,
+    color: '#222',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+    marginBottom: 16,
+  },
+  reviewerInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  reviewerAvatar: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#ff385c',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  reviewerName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#222',
+    marginBottom: 2,
+  },
+  reviewerDetails: {
+    fontSize: 12,
+    color: '#717171',
+  },
+  showAllReviewsButton: {
+    backgroundColor: '#f7f7f7',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  showAllReviewsText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#222',
   },
 
   /** Bottom Spacing */
