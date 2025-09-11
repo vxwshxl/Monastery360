@@ -64,8 +64,8 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
       const buttonX = buttonWidth * positionInGroup;
 
       indicatorPosition.value = withSpring(buttonX, {
-        damping: 20,
-        stiffness: 300,
+        damping: 60,
+        stiffness: 1000,
       });
     }
   }, [state.index]);
