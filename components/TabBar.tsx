@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { StyleSheet, View, Dimensions } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import TabBarButton from './TabBarButton';
+import { AREventEmitter, AR_EVENTS } from './AREventEmitter';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const TAB_BAR_PADDING = 20;
@@ -27,6 +28,10 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   // Animated values
   const indicatorPosition = useSharedValue(0);
   const tabBarOffset = useSharedValue(0);
+  const leftGroupOffset = useSharedValue(0);
+  const rightGroupOffset = useSharedValue(0);
+  const centerRotation = useSharedValue(0);
+  const isARToggled = useSharedValue(true);
 
   const availableWidth = SCREEN_WIDTH - TAB_BAR_PADDING * 2;
   const centerGroupWidth = groupedRoutes.center.length > 0 ? 60 : 0;
@@ -50,11 +55,18 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const { options } = descriptors[activeRoute.key];
     const activeGroup = (options.tabBarGroup || 'left') as keyof typeof groupedRoutes;
 
-    // 👇 Slide down when on explore
+    // 👇 Slide down when on explore or ar
     if (activeRoute.name === 'explore') {
       tabBarOffset.value = withTiming(100, { duration: 300 });
+    } else if (activeRoute.name === 'ar') {
+      leftGroupOffset.value = withTiming(100, { duration: 300 });
+      rightGroupOffset.value = withTiming(100, { duration: 300 });
+      centerRotation.value = withTiming(-45, { duration: 300 });
     } else {
       tabBarOffset.value = withTiming(0, { duration: 300 });
+      leftGroupOffset.value = withTiming(0, { duration: 300 });
+      rightGroupOffset.value = withTiming(0, { duration: 300 });
+      centerRotation.value = withTiming(0, { duration: 300 });
     }
 
     if (activeGroup !== 'center') {
@@ -74,6 +86,50 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const animatedTabBarStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: tabBarOffset.value }],
   }));
+
+  const animatedLeftGroupStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: leftGroupOffset.value }],
+  }));
+
+  const animatedRightGroupStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: rightGroupOffset.value }],
+  }));
+
+  const animatedCenterStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${centerRotation.value}deg` }],
+  }));
+
+   useEffect(() => {
+    const subscription = AREventEmitter.addListener(AR_EVENTS.WEBVIEW_OPENED, () => {
+      // Trigger the "animate in" part
+      if (!isARToggled.value) {  // Only if not already toggled
+        leftGroupOffset.value = withTiming(100, { duration: 300 });
+        rightGroupOffset.value = withTiming(100, { duration: 300 });
+        centerRotation.value = withTiming(-45, { duration: 300 });
+        isARToggled.value = true;
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
+
+  const toggleARAnimations = () => {
+    // console.log("AR Toggle:", isARToggled.value);
+    if (isARToggled.value) {
+      // Reset back
+      leftGroupOffset.value = withTiming(0, { duration: 300 });
+      rightGroupOffset.value = withTiming(0, { duration: 300 });
+      centerRotation.value = withTiming(0, { duration: 300 });
+
+      AREventEmitter.emit(AR_EVENTS.TOGGLE_RESET);
+    } else {
+      // Animate in
+      leftGroupOffset.value = withTiming(100, { duration: 300 });
+      rightGroupOffset.value = withTiming(100, { duration: 300 });
+      centerRotation.value = withTiming(-45, { duration: 300 });
+    }
+    isARToggled.value = !isARToggled.value;
+  };
 
   const renderTabGroup = (
     groupRoutes: Array<{ route: any; index: number }>,
@@ -133,7 +189,19 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                 });
 
                 if (!isFocused && !event.defaultPrevented) {
+                  // console.log("AR 174: ", isARToggled.value);
+                  isARToggled.value = true;
                   navigation.navigate(route.name, route.params);
+                } else if (isFocused && route.name === 'ar') {
+                  // 👇 Reset AR animations when AR tab is pressed while already active
+                  toggleARAnimations();
+                  // console.log(isARToggled.value);
+                  // Emit tabPress for AR even when already focused
+                  navigation.emit({
+                    type: "tabPress",
+                    target: route.key,
+                    canPreventDefault: false,
+                  });
                 }
               };
 
@@ -181,7 +249,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
           const { options } = descriptors[route.key];
           const isFocused = state.index === routeIndex;
 
-          const onPress = () => {
+          const onPress = () => {            
             const event = navigation.emit({
               type: 'tabPress',
               target: route.key,
@@ -189,7 +257,19 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             });
 
             if (!isFocused && !event.defaultPrevented) {
+              // console.log("AR 242:", isARToggled.value);
+              isARToggled.value = false;
               navigation.navigate(route.name, route.params);
+            } else if (isFocused && route.name === 'ar') {
+              // 👇 Toggle AR animations when AR tab is pressed while already active
+              toggleARAnimations();
+              // console.log(isARToggled.value);
+              // Emit tabPress for AR even when already focused
+              navigation.emit({
+                type: "tabPress",
+                target: route.key,
+                canPreventDefault: false,
+              });
             }
           };
 
@@ -217,23 +297,23 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   };
 
   return (
-    <Animated.View style={[styles.container, animatedTabBarStyle]}>
+    <View style={styles.container}>
       <View style={styles.tabBarContainer}>
-        <View style={[styles.sideContainer, { marginRight: groupedRoutes.center.length > 0 ? GROUP_GAP : 0 }]}>
+        <Animated.View style={[styles.sideContainer, { marginRight: groupedRoutes.center.length > 0 ? GROUP_GAP : 0 }, animatedTabBarStyle, animatedLeftGroupStyle]}>
           {renderTabGroup(groupedRoutes.left, 'left')}
-        </View>
+        </Animated.View>
 
         {groupedRoutes.center.length > 0 && (
-          <View style={styles.centerContainer}>
+          <Animated.View style={[styles.centerContainer, animatedCenterStyle, animatedTabBarStyle]}>
             {renderTabGroup(groupedRoutes.center, 'center')}
-          </View>
+          </Animated.View>
         )}
 
-        <View style={[styles.sideContainer, { marginLeft: groupedRoutes.center.length > 0 ? GROUP_GAP : 0 }]}>
+        <Animated.View style={[styles.sideContainer, { marginLeft: groupedRoutes.center.length > 0 ? GROUP_GAP : 0 }, animatedTabBarStyle, animatedRightGroupStyle]}>
           {renderTabGroup(groupedRoutes.right, 'right')}
-        </View>
+        </Animated.View>
       </View>
-    </Animated.View>
+    </View>
   );
 }
 
