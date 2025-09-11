@@ -9,7 +9,7 @@ import LightText from '@/assets/fonts/LightText';
 import MediumText from '@/assets/fonts/MediumText';
 import BoldText from '@/assets/fonts/BoldText';
 
-const index = () => {
+const Monastery = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -22,7 +22,7 @@ const index = () => {
         {/* Cards Grid */}
         <View style={styles.cardsGrid}>
           {markers.map((trip) => (
-            <Link href="/destination" asChild key={trip.id}>
+            <Link href={`/destination?id=${trip.id}`} asChild key={trip.id}>
               <TouchableOpacity style={styles.card}>
                 <Image source={{ uri: trip.image }} style={styles.cardImage} />
                 <Text style={styles.cardTitle}>{trip.name}</Text>
@@ -41,7 +41,7 @@ const index = () => {
   );
 };
 
-export default index;
+export default Monastery;
 
 const styles = StyleSheet.create({
   container: {
