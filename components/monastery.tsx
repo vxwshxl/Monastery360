@@ -7,24 +7,28 @@ const monastery = [
   {
     id: 1,
     title: "Tashiding Monastery",
+    location: "Gyalshing, Sikkim",
     rating: 4.98,
     image: { uri: "https://s7ap1.scene7.com/is/image/incredibleindia/spiritual-spots-in-pelling-popular?qlt=82&ts=1726655959297,3" },
   },
   {
     id: 2,
     title: "Rumtek Monastery",
+    location: "Gangtok, Sikkim",
     rating: 4.94,
     image: { uri: "https://www.tourmyindia.com/states/sikkim/images/rumtek1.jpg" },
   },
   {
     id: 3,
     title: "Phensang Monastery",
+    location: "Gangtok, Sikkim",
     rating: 4.93,
     image: { uri: "https://media1.thrillophilia.com/filestore/puil20n60h8emomhi7qokxljttqb_thrangutaraabbey.jpg?w=400&dpr=2,7" },
   },
   {
     id: 4,
     title: "Pemayangtse Monastery",
+    location: "Gyalshing, Sikkim",
     rating: 4.98,
     image: { uri: "https://s7ap1.scene7.com/is/image/incredibleindia/pemayangtse-monastery-pelling-sikkim-2-attr-hero?qlt=82&ts=1726656027807,2" },
   },
@@ -48,6 +52,8 @@ const index = () => {
                 <Image source={trip.image} style={styles.cardImage} />
                 <Text style={styles.cardTitle}>{trip.title}</Text>
                 <View style={styles.ratingRow}>
+                  <Text style={styles.ratingText}>{trip.location}</Text>
+                  <Text style={styles.ratingText}> • </Text>
                   <Ionicons name="star" size={14} color="#000" />
                   <Text style={styles.ratingText}>{trip.rating}</Text>
                 </View>
