@@ -2,37 +2,12 @@ import { Ionicons } from '@expo/vector-icons';
 import React from "react";
 import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View, ScrollView } from "react-native";
 import { Link } from "expo-router";
+import markers from './markers';
 
-const monastery = [
-  {
-    id: 1,
-    title: "Tashiding Monastery",
-    location: "Gyalshing, Sikkim",
-    rating: 4.98,
-    image: { uri: "https://s7ap1.scene7.com/is/image/incredibleindia/spiritual-spots-in-pelling-popular?qlt=82&ts=1726655959297,3" },
-  },
-  {
-    id: 2,
-    title: "Rumtek Monastery",
-    location: "Gangtok, Sikkim",
-    rating: 4.94,
-    image: { uri: "https://www.tourmyindia.com/states/sikkim/images/rumtek1.jpg" },
-  },
-  {
-    id: 3,
-    title: "Phensang Monastery",
-    location: "Gangtok, Sikkim",
-    rating: 4.93,
-    image: { uri: "https://media1.thrillophilia.com/filestore/puil20n60h8emomhi7qokxljttqb_thrangutaraabbey.jpg?w=400&dpr=2,7" },
-  },
-  {
-    id: 4,
-    title: "Pemayangtse Monastery",
-    location: "Gyalshing, Sikkim",
-    rating: 4.98,
-    image: { uri: "https://s7ap1.scene7.com/is/image/incredibleindia/pemayangtse-monastery-pelling-sikkim-2-attr-hero?qlt=82&ts=1726656027807,2" },
-  },
-];
+// FONTS
+import LightText from '@/assets/fonts/LightText';
+import MediumText from '@/assets/fonts/MediumText';
+import BoldText from '@/assets/fonts/BoldText';
 
 const index = () => {
   return (
@@ -46,11 +21,11 @@ const index = () => {
 
         {/* Cards Grid */}
         <View style={styles.cardsGrid}>
-          {monastery.map((trip) => (
+          {markers.map((trip) => (
             <Link href="/destination" asChild key={trip.id}>
               <TouchableOpacity style={styles.card}>
-                <Image source={trip.image} style={styles.cardImage} />
-                <Text style={styles.cardTitle}>{trip.title}</Text>
+                <Image source={{ uri: trip.image }} style={styles.cardImage} />
+                <Text style={styles.cardTitle}>{trip.name}</Text>
                 <View style={styles.ratingRow}>
                   <Text style={styles.ratingText}>{trip.location}</Text>
                   <Text style={styles.ratingText}> • </Text>

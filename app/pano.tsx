@@ -68,10 +68,10 @@ const styles = StyleSheet.create({
     zIndex: 3,
   },
   headerButton: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     backgroundColor: "rgba(0,0,0,0.3)",
-    borderRadius: 20,
+    borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
   },

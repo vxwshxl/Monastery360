@@ -12,6 +12,7 @@ import {
   Dimensions,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 const { width } = Dimensions.get("window");
 const HEADER_HEIGHT = 300;
@@ -73,21 +74,13 @@ const DestinationDetailsPage = () => {
         
         <View style={styles.rightControls}>
           <TouchableOpacity style={styles.headerButton}>
-            <Ionicons name="share-outline" size={20} color="#333" />
+            <Ionicons name="share-outline" size={24} color="#333" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerButton}>
-            <Ionicons name="heart-outline" size={20} color="#333" />
+            <Ionicons name="heart-outline" size={24} color="#333" />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
-
-      {/* 360 Button */}
-      <Link href="/pano" asChild>
-        <TouchableOpacity style={styles.button360}>
-          <Ionicons name="reload-circle-outline" size={20} color="#333" />
-          <Text style={styles.button360Text}>360°</Text>
-        </TouchableOpacity>
-      </Link>
 
       {/* Scrollable Content */}
       <View style={styles.contentContainer}>
@@ -135,34 +128,46 @@ const DestinationDetailsPage = () => {
               </View>
             </View>
 
-            {/* Adderess Info */}
-            <View style={styles.addressSection}>
-              <Image 
-                source={require("../assets/panoramic/p1.jpg")} 
-                style={styles.addressAvatar} 
-              />
-              <View style={styles.addressInfo}>
-                <Text style={styles.addressName}>addressed by Roma Singh</Text>
-                <Text style={styles.addressDetails}>Superaddress · 2 years addressing</Text>
-              </View>
+            {/* About this place */}
+            <View style={styles.aboutSection}>
+              <Text style={styles.sectionTitle}>About this place</Text>
+              <Text style={styles.aboutText}>
+                In Risa Forest Green we understand that some holidays are all about finding a space for your soul to soar. Sandwiched between two forests our spacious rooms invite you to let your soul dance to the music of cicadas, leaves rustling in the breeze, the sound of raindrops or else to the wider variety of birds who call these forests their home. Each room is designed with making your holiday a memorable...
+              </Text>
             </View>
 
-            {/* Features */}
-            <View style={styles.featuresSection}>
-              <View style={styles.feature}>
-                <Ionicons name="checkmark-circle-outline" size={24} color="#333" />
-                <View style={styles.featureText}>
-                  <Text style={styles.featureTitle}>Great check-in experience</Text>
-                  <Text style={styles.featureDescription}>Recent guests loved the smooth start to this stay.</Text>
-                </View>
-              </View>
+            {/* Where you'll be */}
+            <View style={styles.locationSection}>
+              <Text style={styles.sectionTitle}>Where you'll be</Text>
+              <Text style={styles.locationSubtitle}>Shillong, Meghalaya, India</Text>
               
-              <View style={styles.feature}>
-                <Ionicons name="home-outline" size={24} color="#333" />
-                <View style={styles.featureText}>
-                  <Text style={styles.featureTitle}>Room in a home</Text>
-                  <Text style={styles.featureDescription}>Your own room in a home, plus access to shared spaces.</Text>
-                </View>
+              <View style={styles.mapContainer}>
+                <MapView
+                  // provider={PROVIDER_GOOGLE}
+                  style={styles.map}
+                  initialRegion={{
+                    latitude: 25.5788,
+                    longitude: 91.8933,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                  scrollEnabled={false}
+                  zoomEnabled={false}
+                  pitchEnabled={false}
+                  rotateEnabled={false}
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: 25.5788,
+                      longitude: 91.8933,
+                    }}
+                    title="HillCrest - Golden Horizon"
+                    description="Room in Shillong, India"
+                  />
+                </MapView>
+                <TouchableOpacity style={styles.expandButton}>
+                  <Ionicons name="expand" size={16} color="#333" />
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -171,16 +176,13 @@ const DestinationDetailsPage = () => {
           </View>
         </Animated.ScrollView>
 
-        {/* Fixed Pricing and Reserve Section */}
+        {/* Experience Section */}
         <View style={styles.fixedBottomSection}>
-          <View style={styles.pricingInfo}>
-            <Text style={styles.price}>₹5,706</Text>
-            <Text style={styles.priceDetails}>For 2 nights · 12-14 Sept</Text>
-          </View>
-          
-          <TouchableOpacity style={styles.reserveButton}>
-            <Text style={styles.reserveButtonText}>Reserve</Text>
-          </TouchableOpacity>
+          <Link href="/pano" asChild>
+            <TouchableOpacity style={styles.experienceButton}>
+              <Text style={styles.experienceButtonText}>Experience 360°</Text>
+            </TouchableOpacity>
+          </Link>
         </View>
       </View>
     </View>
@@ -231,10 +233,10 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   headerButton: {
-    width: 32,
-    height: 32,
+    width: 50,
+    height: 50,
     backgroundColor: "rgba(255,255,255,0.9)",
-    borderRadius: 16,
+    borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
@@ -243,29 +245,6 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
-  button360: {
-    position: "absolute",
-    bottom: 120,
-    right: 20,
-    backgroundColor: "rgba(255,255,255,0.95)",
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 4,
-    zIndex: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  button360Text: {
-    fontSize: 12,
-    fontWeight: "500",
-    color: "#333",
-  },
   imageCounterBadge: {
     position: "absolute",
     bottom: 20,
@@ -273,7 +252,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.6)",
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 50,
   },
   imageCounterText: {
     color: "#fff",
@@ -301,8 +280,8 @@ const styles = StyleSheet.create({
   /** Content Card */
   contentCard: {
     backgroundColor: "#fff",
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
     paddingHorizontal: 24,
     paddingTop: 24,
     marginTop: -20,
@@ -359,58 +338,65 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  /** Address Section */
-  addressSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 16,
+  /** About Section */
+  aboutSection: {
+    paddingVertical: 24,
     borderBottomWidth: 1,
     borderBottomColor: "#EBEBEB",
-    marginBottom: 24,
   },
-  addressAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginRight: 16,
-  },
-  addressInfo: {
-    flex: 1,
-  },
-  addressName: {
-    fontSize: 16,
+  sectionTitle: {
+    fontSize: 20,
     fontWeight: "600",
     color: "#222",
-    marginBottom: 2,
+    marginBottom: 16,
   },
-  addressDetails: {
-    fontSize: 14,
+  aboutText: {
+    fontSize: 16,
     color: "#717171",
+    lineHeight: 24,
   },
 
-  /** Features Section */
-  featuresSection: {
-    gap: 24,
-    marginBottom: 24,
+  /** Location Section */
+  locationSection: {
+    paddingVertical: 24,
   },
-  feature: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-  },
-  featureText: {
-    flex: 1,
-    marginLeft: 16,
-  },
-  featureTitle: {
-    fontSize: 16,
+  sectionTitle: {
+    fontSize: 20,
     fontWeight: "600",
     color: "#222",
-    marginBottom: 4,
+    marginBottom: 16,
   },
-  featureDescription: {
-    fontSize: 14,
+  locationSubtitle: {
+    fontSize: 16,
     color: "#717171",
-    lineHeight: 18,
+    marginBottom: 16,
+  },
+  mapContainer: {
+    position: "relative",
+    height: 200,
+    borderRadius: 20,
+    overflow: "hidden",
+    backgroundColor: "#f5f5f5",
+  },
+  map: {
+    width: "100%",
+    height: "100%",
+  },
+  expandButton: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    width: 32,
+    height: 32,
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
 
   /** Bottom Spacing */
@@ -427,34 +413,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingVertical: 16,
+    justifyContent: "center",
+    paddingHorizontal: 40,
+    paddingVertical: 18,
     borderTopWidth: 1,
     borderTopColor: "#EBEBEB",
     zIndex: 4,
   },
-  pricingInfo: {
-    flex: 1,
+  experienceButton: {
+    backgroundColor: "#29292B",
+    paddingVertical: 18,
+    borderRadius: 50,
   },
-  price: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#222",
-  },
-  priceDetails: {
-    fontSize: 14,
-    color: "#717171",
-  },
-  reserveButton: {
-    backgroundColor: "#E51E53",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  reserveButtonText: {
+  experienceButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+    width: 250,
+    textAlign: "center",
   },
 });

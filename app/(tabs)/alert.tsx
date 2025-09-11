@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const AlertNotificationPanel = () => {
+  const navigation = useNavigation();
+
   const [alerts, setAlerts] = useState([
     {
       id: 1,
@@ -139,6 +142,35 @@ const AlertNotificationPanel = () => {
     return `${hours} hours ago`;
   };
 
+  // Function to determine if alert is a danger alert
+  const isDangerAlert = (alertType, severity) => {
+    const dangerTypes = ['landslide', 'road-closed', 'flood', 'fire', 'snow'];
+    return dangerTypes.includes(alertType) || severity === 'high' || severity === 'medium';
+  };
+
+  // Function to handle alert press
+  const handleAlertPress = (alert) => {
+    if (isDangerAlert(alert.type, alert.severity)) {
+      // Navigate to explore.tsx for danger alerts
+      navigation.navigate('explore', {
+        alertData: alert,
+        alertType: 'danger'
+      });
+    } else if (alert.type === 'cultural-event') {
+      // Navigate to index.tsx for cultural events
+      navigation.navigate('index', {
+        alertData: alert,
+        alertType: 'event'
+      });
+    } else {
+      // Default navigation for other types
+      navigation.navigate('explore', {
+        alertData: alert,
+        alertType: 'general'
+      });
+    }
+  };
+
   const legendItems = [
     { icon: 'business', label: 'Monastery', color: '#d97706' },
     { icon: 'radio-button-on', label: 'Start', color: '#10b981' },
@@ -192,7 +224,12 @@ const AlertNotificationPanel = () => {
       {/* Alerts Cards */}
       <ScrollView style={styles.alertsList} showsVerticalScrollIndicator={false}>
         {alerts.map((alert) => (
-          <View key={alert.id} style={styles.alertCard}>
+          <TouchableOpacity 
+            key={alert.id} 
+            style={styles.alertCard}
+            onPress={() => handleAlertPress(alert)}
+            activeOpacity={0.7}
+          >
             <View
               style={[
                 styles.alertContent,
@@ -206,6 +243,13 @@ const AlertNotificationPanel = () => {
                 <View style={styles.alertTitleRow}>
                   <Ionicons name={alert.icon} size={22} color={alert.colors.icon} />
                   <Text style={styles.alertTitle}>{alert.title}</Text>
+                  {/* Add navigation indicator */}
+                  <Ionicons 
+                    name="chevron-forward" 
+                    size={16} 
+                    color="#9ca3af" 
+                    style={styles.navigationIcon}
+                  />
                 </View>
                 <Text style={styles.timeAgo}>
                   {getTimeAgo(alert.timestamp)}
@@ -216,11 +260,16 @@ const AlertNotificationPanel = () => {
                 {alert.description}
               </Text>
               
-              <Text style={styles.alertRadius}>
-                Radius ~ {alert.radius}
-              </Text>
+              <View style={styles.alertFooter}>
+                <Text style={styles.alertRadius}>
+                  Radius ~ {alert.radius}
+                </Text>
+                <Text style={styles.tapHint}>
+                  Tap for details
+                </Text>
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
@@ -289,6 +338,9 @@ const styles = StyleSheet.create({
     color: '#111827',
     marginLeft: 10,
   },
+  navigationIcon: {
+    marginLeft: 8,
+  },
   timeAgo: {
     fontSize: 12,
     fontWeight: '400',
@@ -302,10 +354,21 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     lineHeight: 20,
   },
+  alertFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   alertRadius: {
     fontSize: 12,
     fontWeight: '400',
     color: '#6b7280',
+  },
+  tapHint: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: '#9ca3af',
+    fontStyle: 'italic',
   },
   legendCard: {
     backgroundColor: '#ffffff',
