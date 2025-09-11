@@ -45,8 +45,8 @@ const index = () => {
           
           {/* Search Bar */}
           <TouchableOpacity style={styles.searchButton}>
-            <Ionicons name="search" size={20} color="#999" />
-            <Text style={styles.searchPlaceholder}>Start your search</Text>
+            <Ionicons name="search" size={25} color="#999" />
+            <BoldText style={styles.searchPlaceholder}>Start your search</BoldText>
             <TouchableOpacity style={styles.filterButton}>
               <Ionicons name="options" size={20} color="#fff" />
             </TouchableOpacity>

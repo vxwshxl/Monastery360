@@ -6,25 +6,25 @@ import { Link } from "expo-router";
 const monastery = [
   {
     id: 1,
-    title: "Room in Shillong",
+    title: "Tashiding Monastery",
     rating: 4.98,
     image: { uri: "https://s7ap1.scene7.com/is/image/incredibleindia/spiritual-spots-in-pelling-popular?qlt=82&ts=1726655959297,3" },
   },
   {
     id: 2,
-    title: "Room in Shillong",
+    title: "Rumtek Monastery",
     rating: 4.94,
     image: { uri: "https://www.tourmyindia.com/states/sikkim/images/rumtek1.jpg" },
   },
   {
     id: 3,
-    title: "Flat in Bangalore Urban",
+    title: "Phensang Monastery",
     rating: 4.93,
     image: { uri: "https://media1.thrillophilia.com/filestore/puil20n60h8emomhi7qokxljttqb_thrangutaraabbey.jpg?w=400&dpr=2,7" },
   },
   {
     id: 4,
-    title: "Apartment in Bangalore Urban",
+    title: "Pemayangtse Monastery",
     rating: 4.98,
     image: { uri: "https://s7ap1.scene7.com/is/image/incredibleindia/pemayangtse-monastery-pelling-sikkim-2-attr-hero?qlt=82&ts=1726656027807,2" },
   },
