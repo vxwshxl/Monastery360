@@ -146,23 +146,25 @@ const Page = () => {
   if (webViewUrl) {
     return (
       <View style={styles.fullscreenContainer}>
-        <StatusBar barStyle="light-content" backgroundColor="#000" translucent={true} />
-        <TouchableOpacity style={styles.backButton} onPress={resetToCamera}>
-          <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
+        {/* Make status bar overlay transparent so the WebView is full-screen */}
+        <StatusBar
+          barStyle="light-content"
+          translucent
+          backgroundColor="transparent"
+        />
+
         <WebView
           source={{ uri: webViewUrl }}
           style={styles.webview}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
+          javaScriptEnabled
+          domStorageEnabled
           mediaPlaybackRequiresUserAction={false}
-          allowsInlineMediaPlaybook={true}
-          geolocationEnabled={true}
-          allowsFullscreenVideo={true}
-          startInLoadingState={true}
-          scalesPageToFit={true}
-          onError={(syntheticEvent) => {
-            const { nativeEvent } = syntheticEvent;
+          allowsInlineMediaPlayback
+          geolocationEnabled
+          allowsFullscreenVideo
+          startInLoadingState
+          scalesPageToFit
+          onError={({ nativeEvent }) => {
             Alert.alert(
               "Error loading page",
               "Failed to load the webpage. Please try again.",
@@ -186,19 +188,22 @@ const Page = () => {
 export default Page;
 
 const styles = StyleSheet.create({
+  fullscreenContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  webview: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   container: {
     flex: 1,
     backgroundColor: "#000",
   },
-  fullscreenContainer: {
-    flex: 1,
-    backgroundColor: "#000",
-    paddingTop: StatusBar.currentHeight || 0, // Android status bar height
-  },
   camera: {
-    flex: 1,
-  },
-  webview: {
     flex: 1,
   },
   overlay: {
