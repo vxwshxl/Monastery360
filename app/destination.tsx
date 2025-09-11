@@ -16,7 +16,7 @@ import { Link, useRouter, useLocalSearchParams } from "expo-router";
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import markers from "../components/markers";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 const HEADER_HEIGHT = 300;
 
 const DestinationDetailsPage = () => {
@@ -26,6 +26,12 @@ const DestinationDetailsPage = () => {
   
   const [monasteryData, setMonasteryData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isMapExpanded, setIsMapExpanded] = useState(false);
+  
+  // Animation values for map expansion
+  const mapHeightAnim = useRef(new Animated.Value(200)).current;
+  const mapOpacityAnim = useRef(new Animated.Value(1)).current;
+  const overlayOpacityAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     // Get monastery data based on the ID from params
@@ -40,6 +46,27 @@ const DestinationDetailsPage = () => {
     }
     setLoading(false);
   }, [params.id]);
+
+  const toggleMapExpansion = () => {
+    const toValue = isMapExpanded ? 200 : height - 300;
+    const opacityValue = isMapExpanded ? 0 : 1;
+    
+    Animated.parallel([
+      Animated.spring(mapHeightAnim, {
+        toValue,
+        useNativeDriver: false,
+        tension: 100,
+        friction: 8,
+      }),
+      Animated.timing(overlayOpacityAnim, {
+        toValue: opacityValue,
+        duration: 300,
+        useNativeDriver: false,
+      }),
+    ]).start();
+    
+    setIsMapExpanded(!isMapExpanded);
+  };
 
   // Animated interpolations
   const headerTranslate = scrollY.interpolate({
@@ -119,6 +146,8 @@ const DestinationDetailsPage = () => {
         </View>
       </SafeAreaView>
 
+      
+
       {/* Scrollable Content */}
       <View style={styles.contentContainer}>
         <Animated.ScrollView
@@ -130,6 +159,7 @@ const DestinationDetailsPage = () => {
           )}
           scrollEventThrottle={16}
           showsVerticalScrollIndicator={false}
+          // scrollEnabled={!isMapExpanded}
         >
           {/* Spacer for Parallax Header */}
           <View style={styles.headerSpacer} />
@@ -223,30 +253,40 @@ const DestinationDetailsPage = () => {
               <Text style={styles.locationSubtitle}>{monasteryData.location}</Text>
               
               <View style={styles.mapContainer}>
-                <MapView
-                  style={styles.map}
-                  initialRegion={{
-                    latitude: monasteryData.coordinates.latitude,
-                    longitude: monasteryData.coordinates.longitude,
-                    latitudeDelta: monasteryData.coordinates.latitudeDelta,
-                    longitudeDelta: monasteryData.coordinates.longitudeDelta,
-                  }}
-                  scrollEnabled={false}
-                  zoomEnabled={false}
-                  pitchEnabled={false}
-                  rotateEnabled={false}
-                >
-                  <Marker
-                    coordinate={{
+                <Animated.View style={[styles.animatedMapContainer, { height: mapHeightAnim }]}>
+                  <MapView
+                    style={styles.map}
+                    initialRegion={{
                       latitude: monasteryData.coordinates.latitude,
                       longitude: monasteryData.coordinates.longitude,
+                      latitudeDelta: monasteryData.coordinates.latitudeDelta,
+                      longitudeDelta: monasteryData.coordinates.longitudeDelta,
                     }}
-                    title={monasteryData.name}
-                    description={monasteryData.location}
+                    scrollEnabled={isMapExpanded}
+                    zoomEnabled={isMapExpanded}
+                    pitchEnabled={isMapExpanded}
+                    rotateEnabled={isMapExpanded}
+                  >
+                    <Marker
+                      coordinate={{
+                        latitude: monasteryData.coordinates.latitude,
+                        longitude: monasteryData.coordinates.longitude,
+                      }}
+                      title={monasteryData.name}
+                      description={monasteryData.location}
+                    />
+                  </MapView>
+                </Animated.View>
+                
+                <TouchableOpacity 
+                  style={styles.expandButton}
+                  onPress={toggleMapExpansion}
+                >
+                  <Ionicons 
+                    name={isMapExpanded ? "contract" : "expand"} 
+                    size={16} 
+                    color="#333" 
                   />
-                </MapView>
-                <TouchableOpacity style={styles.expandButton}>
-                  <Ionicons name="expand" size={16} color="#333" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -288,7 +328,7 @@ const DestinationDetailsPage = () => {
                 </View>
                 <Text style={styles.guestFavouriteTitle}>Visitor Favourite</Text>
                 <Text style={styles.guestFavouriteSubtitle}>
-                  This monastery is among the <Text style={styles.boldText}>top rated</Text> spiritual sites
+                  This place is among the <Text style={styles.boldText}>top-rated</Text> tourist sites
                 </Text>
                 <Text style={styles.guestFavouriteSubtitle}>
                   Appreciated for its atmosphere, heritage, and serenity
@@ -377,14 +417,16 @@ const DestinationDetailsPage = () => {
         </Animated.ScrollView>
 
         {/* Experience Section */}
-        <View style={styles.fixedBottomSection}>
-          <Link href="/pano" asChild>
-            <TouchableOpacity style={styles.experienceButton}>
-              <Ionicons name="camera" size={20} color="#fff" style={styles.buttonIcon} />
-              <Text style={styles.experienceButtonText}>Experience 360°</Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
+        {!isMapExpanded && (
+          <View style={styles.fixedBottomSection}>
+            <Link href="/pano" asChild>
+              <TouchableOpacity style={styles.experienceButton}>
+                <Ionicons name="camera" size={20} color="#fff" style={styles.buttonIcon} />
+                <Text style={styles.experienceButtonText}>Experience 360°</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -470,6 +512,66 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12,
     fontWeight: "500",
+  },
+
+  /** Map Overlay */
+  mapOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.8)",
+    zIndex: 10,
+  },
+  mapOverlayContent: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  mapOverlayHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  mapOverlayTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+  },
+  mapCloseButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  expandedMapContainer: {
+    flex: 1,
+  },
+  expandedMap: {
+    width: "100%",
+    height: "100%",
+  },
+  mapOverlayInfo: {
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: "#e0e0e0",
+  },
+  mapOverlayLocation: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 4,
+  },
+  mapOverlayDescription: {
+    fontSize: 14,
+    color: "#666",
+    lineHeight: 20,
   },
 
   /** Content Container */
@@ -612,10 +714,14 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     position: "relative",
-    height: 200,
     borderRadius: 20,
     overflow: "hidden",
     backgroundColor: "#f5f5f5",
+  },
+  animatedMapContainer: {
+    width: "100%",
+    borderRadius: 20,
+    overflow: "hidden",
   },
   map: {
     width: "100%",
@@ -636,6 +742,27 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
+    zIndex: 5,
+  },
+  mapTouchOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 3,
+  },
+  mapTouchContent: {
+    alignItems: "center",
+    gap: 8,
+  },
+  mapTouchText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "500",
   },
 
   /** Visiting Information Section */

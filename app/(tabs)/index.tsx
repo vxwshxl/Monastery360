@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   searchPlaceholder: {
     fontSize: 16,
-    color: '#999',
+    color: '#000',
     fontWeight: '400',
   },
   filterButton: {
