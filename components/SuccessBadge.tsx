@@ -128,7 +128,7 @@ const SuccessBadge: React.FC<SuccessBadgeProps> = ({
             <View style={styles.textWrap}>
               <Text style={styles.title}>{title}</Text>
               <Text style={styles.subtitle}>{subtitle}</Text>
-              <Text style={styles.messageText}>{message}</Text>
+              {/* <Text style={styles.messageText}>{message}</Text> */}
             </View>
           </View>
         </Animated.View>
