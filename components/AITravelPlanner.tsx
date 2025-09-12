@@ -20,6 +20,7 @@ const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 interface AITravelPlannerProps {
   visible: boolean;
   onClose: () => void;
+  onPlanRoute?: (route: any[]) => void;
 }
 
 interface Recommendation {
@@ -31,7 +32,7 @@ interface Recommendation {
   duration: string;
 }
 
-export default function AITravelPlanner({ visible, onClose }: AITravelPlannerProps) {
+export default function AITravelPlanner({ visible, onClose, onPlanRoute }: AITravelPlannerProps) {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const slideAnim = useState(new Animated.Value(screenHeight))[0];
@@ -190,6 +191,18 @@ export default function AITravelPlanner({ visible, onClose }: AITravelPlannerPro
     }
   };
 
+  const handlePlanRoute = () => {
+    if (onPlanRoute && recommendations.length > 0) {
+      const routeData = recommendations.map((rec, index) => ({
+        ...rec.monastery,
+        routeOrder: index + 1,
+        priority: rec.priority
+      }));
+      onPlanRoute(routeData);
+      onClose();
+    }
+  };
+
   return (
     <Modal
       visible={visible}
@@ -300,16 +313,27 @@ export default function AITravelPlanner({ visible, onClose }: AITravelPlannerPro
                   </View>
                 ))}
 
-                {/* AI Footer */}
-                <View style={styles.footerCard}>
-                  <Feather name="sparkles" size={20} color="#9C27B0" />
-                  <BoldText style={styles.footerTitle}>AI-Powered Recommendations</BoldText>
-                  <LightText style={styles.footerText}>
-                    These recommendations are generated using advanced algorithms that analyze ratings, 
-                    reviews, historical significance, and unique features to ensure you have the most 
-                    meaningful spiritual journey.
-                  </LightText>
-                </View>
+                 {/* AI Footer */}
+                 <View style={styles.footerCard}>
+                   <Feather name="sparkles" size={20} color="#9C27B0" />
+                   <BoldText style={styles.footerTitle}>AI-Powered Recommendations</BoldText>
+                   <LightText style={styles.footerText}>
+                     These recommendations are generated using advanced algorithms that analyze ratings, 
+                     reviews, historical significance, and unique features to ensure you have the most 
+                     meaningful spiritual journey.
+                   </LightText>
+                 </View>
+
+                 {/* Plan Route Button */}
+                 <TouchableOpacity style={styles.planRouteButton} onPress={handlePlanRoute}>
+                   <View style={styles.planRouteContent}>
+                     <Feather name="map" size={20} color="#fff" />
+                     <BoldText style={styles.planRouteText}>Plan Route</BoldText>
+                   </View>
+                   <LightText style={styles.planRouteSubtext}>
+                     View optimized route on map
+                   </LightText>
+                 </TouchableOpacity>
               </>
             )}
           </ScrollView>
@@ -563,10 +587,39 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 8,
   },
-  footerText: {
-    fontSize: 13,
-    color: '#7b1fa2',
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-});
+   footerText: {
+     fontSize: 13,
+     color: '#7b1fa2',
+     textAlign: 'center',
+     lineHeight: 18,
+   },
+   planRouteButton: {
+     backgroundColor: '#4CAF50',
+     borderRadius: 12,
+     padding: 20,
+     marginVertical: 16,
+     marginBottom: 30,
+     shadowColor: '#4CAF50',
+     shadowOffset: { width: 0, height: 4 },
+     shadowOpacity: 0.3,
+     shadowRadius: 8,
+     elevation: 6,
+   },
+   planRouteContent: {
+     flexDirection: 'row',
+     alignItems: 'center',
+     justifyContent: 'center',
+     marginBottom: 4,
+   },
+   planRouteText: {
+     fontSize: 18,
+     color: '#fff',
+     marginLeft: 8,
+     fontWeight: 'bold',
+   },
+   planRouteSubtext: {
+     fontSize: 14,
+     color: '#e8f5e8',
+     textAlign: 'center',
+   },
+ });

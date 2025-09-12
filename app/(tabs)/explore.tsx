@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import AITravelPlanner from '../../components/AITravelPlanner';
 import markers from '../../components/markers';
 
@@ -25,6 +25,8 @@ export default function App() {
 
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [showAIPlanner, setShowAIPlanner] = useState(false);
+  const [plannedRoute, setPlannedRoute] = useState<any[]>([]);
+  const [showRoute, setShowRoute] = useState(false);
   const mapRef = useRef<MapView>(null);
   
   // Animation values
@@ -61,6 +63,104 @@ export default function App() {
 
   const handleLocationPress = (marker: any, index: number) => {
     handleMarkerPress(marker, index);
+  };
+
+  const generateRouteCoordinates = (routeData: any[]) => {
+    if (routeData.length < 2) return routeData.map(item => item.coordinates);
+    
+    const routeCoordinates = [];
+    
+    for (let i = 0; i < routeData.length; i++) {
+      const current = routeData[i].coordinates;
+      routeCoordinates.push(current);
+      
+      // Add intermediate waypoints between consecutive monasteries
+      if (i < routeData.length - 1) {
+        const next = routeData[i + 1].coordinates;
+        const intermediatePoints = generateRoadPath(current, next, i);
+        routeCoordinates.push(...intermediatePoints);
+      }
+    }
+    
+    return routeCoordinates;
+  };
+
+  const generateRoadPath = (start: any, end: any, segmentIndex: number) => {
+    const points = [];
+    const steps = 15; // More points for detailed path
+    
+    // Calculate distance to determine path complexity
+    const latDiff = end.latitude - start.latitude;
+    const lngDiff = end.longitude - start.longitude;
+    const distance = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff);
+    
+    for (let i = 1; i < steps; i++) {
+      const ratio = i / steps;
+      
+      // Create a more realistic mountain road path
+      const baseLat = start.latitude + (latDiff * ratio);
+      const baseLng = start.longitude + (lngDiff * ratio);
+      
+      // Add curves that simulate mountain roads
+      const curvePhase = ratio * Math.PI;
+      const curveAmplitude = distance * 0.3; // Curve intensity based on distance
+      
+      // Primary curve (sine wave for smooth mountain road)
+      const primaryCurve = Math.sin(curvePhase) * curveAmplitude;
+      
+      // Secondary curve for more realistic road following terrain
+      const secondaryCurve = Math.sin(curvePhase * 2) * curveAmplitude * 0.3;
+      
+      // Add some variation to simulate road following valleys and ridges
+      const terrainVariation = Math.sin(curvePhase * 3) * curveAmplitude * 0.1;
+      
+      const lat = baseLat + primaryCurve + secondaryCurve + terrainVariation;
+      const lng = baseLng + (primaryCurve * 0.6) + (secondaryCurve * 0.4) + (terrainVariation * 0.8);
+      
+      points.push({
+        latitude: lat,
+        longitude: lng
+      });
+    }
+    
+    return points;
+  };
+
+
+  const handlePlanRoute = (routeData: any[]) => {
+    setPlannedRoute(routeData);
+    setShowRoute(true);
+    
+    // Fit map to show all route points
+    if (routeData.length > 0 && mapRef.current) {
+      const coordinates = routeData.map(item => item.coordinates);
+      
+      // Calculate bounds
+      const latitudes = coordinates.map(coord => coord.latitude);
+      const longitudes = coordinates.map(coord => coord.longitude);
+      
+      const minLat = Math.min(...latitudes);
+      const maxLat = Math.max(...latitudes);
+      const minLng = Math.min(...longitudes);
+      const maxLng = Math.max(...longitudes);
+      
+      const centerLat = (minLat + maxLat) / 2;
+      const centerLng = (minLng + maxLng) / 2;
+      const deltaLat = (maxLat - minLat) * 1.2; // Add some padding
+      const deltaLng = (maxLng - minLng) * 1.2;
+      
+      mapRef.current.animateToRegion({
+        latitude: centerLat,
+        longitude: centerLng,
+        latitudeDelta: Math.max(deltaLat, 0.1),
+        longitudeDelta: Math.max(deltaLng, 0.1),
+      }, 1000);
+    }
+  };
+
+  const clearRoute = () => {
+    setShowRoute(false);
+    setPlannedRoute([]);
   };
 
   // PanResponder for drag gestures
@@ -131,7 +231,8 @@ export default function App() {
         style={styles.map}
         initialRegion={markers[0].coordinates}
       >
-        {markers.map((marker, index) => (
+        {/* Regular markers */}
+        {!showRoute && markers.map((marker, index) => (
           <Marker
             key={index}
             coordinate={{
@@ -143,6 +244,51 @@ export default function App() {
             onPress={() => handleMarkerPress(marker, index)}
           />
         ))}
+
+        {/* Route markers and polyline */}
+        {showRoute && plannedRoute.length > 0 && (
+          <>
+            {/* Route polyline with intermediate waypoints */}
+            <Polyline
+              coordinates={generateRouteCoordinates(plannedRoute)}
+              strokeColor="#2E7D32"
+              strokeWidth={5}
+              lineDashPattern={[10, 5]}
+            />
+            {/* Secondary polyline for road effect */}
+            <Polyline
+              coordinates={generateRouteCoordinates(plannedRoute)}
+              strokeColor="#4CAF50"
+              strokeWidth={3}
+              lineDashPattern={[15, 8]}
+            />
+            
+            {/* Route markers with numbers */}
+            {plannedRoute.map((item, index) => (
+              <Marker
+                key={`route-${item.id}`}
+                coordinate={{
+                  latitude: item.coordinates.latitude,
+                  longitude: item.coordinates.longitude,
+                }}
+                title={`${index + 1}. ${item.name}`}
+                description={`Priority: ${item.priority.toUpperCase()}`}
+                onPress={() => handleMarkerPress(item, index)}
+              >
+                <View style={styles.routeMarkerContainer}>
+                  <View style={[
+                    styles.routeMarker,
+                    item.priority === 'high' && styles.highPriorityMarker,
+                    item.priority === 'medium' && styles.mediumPriorityMarker,
+                    item.priority === 'low' && styles.lowPriorityMarker,
+                  ]}>
+                    <BoldText style={styles.routeMarkerNumber}>{index + 1}</BoldText>
+                  </View>
+                </View>
+              </Marker>
+            ))}
+          </>
+        )}
       </MapView>
 
       {/* Top Navigation Buttons */}
@@ -159,6 +305,13 @@ export default function App() {
         <TouchableOpacity style={styles.navButton} onPress={() => setShowAIPlanner(true)}>
           <Feather name="compass" size={24} color="#333" />
         </TouchableOpacity>
+
+        {/* Clear Route Button */}
+        {showRoute && (
+          <TouchableOpacity style={styles.clearRouteButton} onPress={clearRoute}>
+            <Feather name="x" size={20} color="#fff" />
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Draggable Bottom List */}
@@ -218,7 +371,8 @@ export default function App() {
       {/* AI Travel Planner Modal */}
       <AITravelPlanner 
         visible={showAIPlanner} 
-        onClose={() => setShowAIPlanner(false)} 
+        onClose={() => setShowAIPlanner(false)}
+        onPlanRoute={handlePlanRoute}
       />
     </View>
   );
@@ -330,5 +484,52 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 8,
+  },
+  clearRouteButton: {
+    width: 48,
+    height: 48,
+    backgroundColor: '#f44336',
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: '#d32f2f',
+  },
+  routeMarkerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  routeMarker: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  highPriorityMarker: {
+    backgroundColor: '#4CAF50',
+  },
+  mediumPriorityMarker: {
+    backgroundColor: '#FF9800',
+  },
+  lowPriorityMarker: {
+    backgroundColor: '#9E9E9E',
+  },
+  routeMarkerNumber: {
+    fontSize: 16,
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
