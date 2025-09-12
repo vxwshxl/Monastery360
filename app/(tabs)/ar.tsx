@@ -1,16 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, View, Text, Alert, TouchableOpacity, StatusBar } from "react-native";
-import { WebView } from "react-native-webview";
-import { CameraView, Camera } from "expo-camera";
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { Camera, CameraView } from "expo-camera";
+import React, { useEffect, useRef, useState } from "react";
+import { Alert, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { WebView } from "react-native-webview";
 import { AREventEmitter, AR_EVENTS } from '../../components/AREventEmitter';
+import SuccessBadge from '../../components/SuccessBadge';
 
 const Page = () => {
-  const [hasPermission, setHasPermission] = useState(null);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
-  const [webViewUrl, setWebViewUrl] = useState(null);
+  const [webViewUrl, setWebViewUrl] = useState<string | null>(null);
   const [showCamera, setShowCamera] = useState(true);
-  const cameraRef = useRef(null);
+  const [showSuccessBadge, setShowSuccessBadge] = useState(false);
+  const cameraRef = useRef<CameraView>(null);
   const isFocused = useIsFocused();
 
   // Only show camera when page is focused AND we're in camera mode
@@ -27,6 +29,7 @@ const Page = () => {
       setWebViewUrl(null);
       setShowCamera(true);
       setScanned(false);
+      setShowSuccessBadge(false);
     }, [])
   );
 
@@ -53,13 +56,13 @@ const Page = () => {
     setHasPermission(status === "granted");
   };
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
     if (scanned) return;
     
     setScanned(true);
     
     // Check if the scanned data is a valid URL
-    const isValidUrl = (string) => {
+    const isValidUrl = (string: string) => {
       try {
         new URL(string);
         return true;
@@ -81,6 +84,7 @@ const Page = () => {
         url = `https://${data}`;
       }
       
+      // Store the URL and show webview immediately
       setWebViewUrl(url);
       setShowCamera(false);
     } else {
@@ -92,10 +96,15 @@ const Page = () => {
     }
   };
 
+  const handleSuccessBadgeDismiss = () => {
+    setShowSuccessBadge(false);
+  };
+
   const resetToCamera = () => {
     setWebViewUrl(null);
     setShowCamera(true);
     setScanned(false);
+    setShowSuccessBadge(false);
   };
 
   if (hasPermission === null) {
@@ -164,6 +173,10 @@ const Page = () => {
           allowsFullscreenVideo
           startInLoadingState
           scalesPageToFit
+          onLoad={() => {
+            // Show success badge when webview loads successfully
+            setShowSuccessBadge(true);
+          }}
           onError={({ nativeEvent }) => {
             Alert.alert(
               "Error loading page",
@@ -171,6 +184,13 @@ const Page = () => {
               [{ text: "Back to Camera", onPress: resetToCamera }]
             );
           }}
+        />
+        
+        {/* Success Badge with Confetti - shown when webview loads */}
+        <SuccessBadge
+          visible={showSuccessBadge}
+          onDismiss={handleSuccessBadgeDismiss}
+          message="QR Code Scanned Successfully!"
         />
       </View>
     );
