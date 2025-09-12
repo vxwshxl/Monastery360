@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 16,
+    marginBottom: 100,
     paddingTop: 20,
   },
   monasterySection: {

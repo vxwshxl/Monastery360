@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal, Animated } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal, Animated, Image, Dimensions } from "react-native";
 import Events from '../../components/events';
 import Monastery from '../../components/monastery';
 import Packages from '../../components/packages';
+
+const { width, height } = Dimensions.get('window');
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -11,6 +13,8 @@ const Index = () => {
   const [showLanguageFilter, setShowLanguageFilter] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [fadeAnim] = useState(new Animated.Value(0));
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [mapFadeAnim] = useState(new Animated.Value(0));
 
   // Language options
   const languages = [
@@ -53,6 +57,35 @@ const Index = () => {
     }).start(() => {
       setShowLanguageFilter(false);
     });
+  };
+
+  // Handle floating download button press
+  const handleDownloadPress = () => {
+    setShowMapModal(true);
+    Animated.timing(mapFadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // Close map modal
+  const closeMapModal = () => {
+    Animated.timing(mapFadeAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setShowMapModal(false);
+    });
+  };
+
+  // Handle download map button press
+  const handleDownloadMap = () => {
+    // Add your download logic here
+    console.log("Downloading Sikkim map...");
+    // You can add actual download functionality here
+    closeMapModal();
   };
 
   // Render content based on active tab
@@ -217,7 +250,65 @@ const Index = () => {
           </TouchableOpacity>
         </Modal>
 
+        {/* Map Download Modal */}
+        <Modal
+          visible={showMapModal}
+          transparent={true}
+          animationType="none"
+          onRequestClose={closeMapModal}
+        >
+          <TouchableOpacity 
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={closeMapModal}
+          >
+            <Animated.View 
+              style={[
+                styles.mapModal,
+                {
+                  opacity: mapFadeAnim,
+                  transform: [{
+                    scale: mapFadeAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.8, 1],
+                    }),
+                  }],
+                }
+              ]}
+            >
+              <View style={styles.mapModalHeader}>
+                <Text style={styles.mapModalTitle}>Sikkim Map</Text>
+                <TouchableOpacity onPress={closeMapModal}>
+                  <Ionicons name="close" size={24} color="#666" />
+                </TouchableOpacity>
+              </View>
+              
+              {/* Map Image Container */}
+              <View style={styles.mapContainer}>
+                <View style={styles.mapPlaceholder}>
+                  <Ionicons name="map" size={80} color="#999" />
+                  <Text style={styles.mapPlaceholderText}>Map of Sikkim</Text>
+                  <Text style={styles.mapPlaceholderSubtext}>
+                    Detailed map showing all districts, monasteries, and tourist attractions
+                  </Text>
+                </View>
+              </View>
+              
+              {/* Download Button */}
+              <TouchableOpacity style={styles.downloadMapButton} onPress={handleDownloadMap}>
+                <Ionicons name="download" size={20} color="#fff" style={{ marginRight: 8 }} />
+                <Text style={styles.downloadMapButtonText}>Download Map</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </TouchableOpacity>
+        </Modal>
+
       </ScrollView>
+
+      {/* Floating Download Button */}
+      <TouchableOpacity style={styles.floatingDownloadButton} onPress={handleDownloadPress}>
+        <Ionicons name="download" size={24} color="#fff" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -227,9 +318,9 @@ export default Index;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
     paddingTop: 10,
     marginBottom: 110,
+    paddingBottom: 100,
     backgroundColor: '#f5f5f5',
   },
   header: {
@@ -324,6 +415,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     width: '100%',
     maxWidth: 320,
+    borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.25,
@@ -396,5 +488,93 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     lineHeight: 22,
+  },
+  // Floating Download Button Styles
+  floatingDownloadButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 30,
+    width: 60,
+    height: 60,
+    backgroundColor: '#29292B',
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 1000,
+  },
+  // Map Modal Styles
+  mapModal: {
+    backgroundColor: '#fff',
+    width: '95%',
+    maxWidth: 400,
+    maxHeight: height * 0.8,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  mapModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  mapModalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  mapContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    minHeight: 300,
+  },
+  mapPlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    padding: 40,
+    minHeight: 300,
+  },
+  mapPlaceholderText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  mapPlaceholderSubtext: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  downloadMapButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#29292B',
+    marginHorizontal: 20,
+    marginBottom: 20,
+    paddingVertical: 14,
+    borderRadius: 12,
+  },
+  downloadMapButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
   },
 });
