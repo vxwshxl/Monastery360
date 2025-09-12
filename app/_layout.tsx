@@ -49,6 +49,16 @@ export default function RootLayout() {
         }}
       />
 
+      {/* Package Details Screen */}
+      <Stack.Screen
+        name="packageDetails"
+        options={{
+          headerShown: false,
+          presentation: "modal", // ✅ Opens like a modal
+          animation: "slide_from_bottom", // ✅ Smooth bottom-to-top animation
+        }}
+      />
+
       {/* 360 Screen */}
       <Stack.Screen
         name="pano"

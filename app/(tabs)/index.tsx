@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, ScrollView, TextInput } from "react-native";
 import Monastery from '../../components/monastery';
 import Events from '../../components/events';
-import Packages from '../../components/events';
+import Packages from '../../components/packages';
 
 // FONTS
 import BoldText from '@/assets/fonts/BoldText';
