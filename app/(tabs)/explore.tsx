@@ -1,23 +1,21 @@
-import React, { useState, useRef } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import {
-  StyleSheet,
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-  Animated,
-  PanResponder,
-} from 'react-native';
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import { Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import React, { useRef, useState } from 'react';
+import {
+  Animated,
+  Dimensions,
+  Image,
+  PanResponder,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import AITravelPlanner from '../../components/AITravelPlanner';
 import markers from '../../components/markers';
 
 // FONTS
-import LightText from '@/assets/fonts/LightText';
-import MediumText from '@/assets/fonts/MediumText';
 import BoldText from '@/assets/fonts/BoldText';
 
 const { height: screenHeight } = Dimensions.get('window');
@@ -26,7 +24,8 @@ export default function App() {
   const navigation = useNavigation();
 
   const [selectedMarker, setSelectedMarker] = useState(null);
-  const mapRef = useRef(null);
+  const [showAIPlanner, setShowAIPlanner] = useState(false);
+  const mapRef = useRef<MapView>(null);
   
   // Animation values
   const translateY = useRef(new Animated.Value(0)).current;
@@ -37,7 +36,7 @@ export default function App() {
   const maxHeight = screenHeight * 0.5;  // 50% - middle screen position
   const dragRange = maxHeight - minHeight;
 
-  const handleMarkerPress = (marker, index) => {
+  const handleMarkerPress = (marker: any, index: number) => {
   setSelectedMarker({ ...marker, index });
 
   // Calculate offset
@@ -60,7 +59,7 @@ export default function App() {
   );
 }
 
-  const handleLocationPress = (marker, index) => {
+  const handleLocationPress = (marker: any, index: number) => {
     handleMarkerPress(marker, index);
   };
 
@@ -76,7 +75,7 @@ export default function App() {
       },
       onPanResponderGrant: () => {
         setIsDragging(true);
-        translateY.setOffset(translateY._value);
+        translateY.setOffset((translateY as any)._value);
       },
       onPanResponderMove: (evt, gestureState) => {
         // Allow both up and down dragging within the range
@@ -88,7 +87,7 @@ export default function App() {
         translateY.flattenOffset();
         
         const { dy, vy } = gestureState;
-        const currentValue = translateY._value;
+        const currentValue = (translateY as any)._value;
         
         // Much more sensitive triggers - respond to small movements
         let shouldSnapToMiddle;
@@ -151,13 +150,13 @@ export default function App() {
         {/* Back Button */}
         <TouchableOpacity 
           style={styles.navButton} 
-          onPress={() => navigation.navigate('index')}
+          onPress={() => (navigation as any).navigate('index')}
         >
           <Feather name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
 
         {/* AI Icon */}
-        <TouchableOpacity style={styles.navButton} onPress={() => console.log('AI pressed')}>
+        <TouchableOpacity style={styles.navButton} onPress={() => setShowAIPlanner(true)}>
           <Feather name="compass" size={24} color="#333" />
         </TouchableOpacity>
       </View>
@@ -196,7 +195,7 @@ export default function App() {
               key={index}
               style={[
                 styles.locationItem,
-                selectedMarker?.index === index && styles.selectedLocationItem,
+                (selectedMarker as any)?.index === index && styles.selectedLocationItem,
               ]}
               onPress={() => handleLocationPress(marker, index)}
             >
@@ -215,6 +214,12 @@ export default function App() {
           ))}
         </ScrollView>
       </Animated.View>
+
+      {/* AI Travel Planner Modal */}
+      <AITravelPlanner 
+        visible={showAIPlanner} 
+        onClose={() => setShowAIPlanner(false)} 
+      />
     </View>
   );
 }
@@ -278,7 +283,6 @@ const styles = StyleSheet.create({
     height: 4,
     backgroundColor: '#ccc',
     borderRadius: 2,
-    transition: 'backgroundColor 0.2s',
   },
   dragIndicatorActive: {
     backgroundColor: '#2196f3',

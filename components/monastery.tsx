@@ -1,13 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useMemo } from "react";
-import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View, ScrollView } from "react-native";
 import { Link } from "expo-router";
+import React, { useMemo } from "react";
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import markers from './markers';
 
 // FONTS
-import LightText from '@/assets/fonts/LightText';
-import MediumText from '@/assets/fonts/MediumText';
-import BoldText from '@/assets/fonts/BoldText';
 
 const Monastery = ({ searchQuery }) => {
   // Filter markers based on search query

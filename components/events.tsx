@@ -1,18 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from "react-native";
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import eventList from './eventList';
 
-const Events = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+const Events = ({ searchQuery = "" }) => {  // Accept searchQuery as prop with default value
   const router = useRouter();
 
   // Filter events based on search query
   const filteredEvents = eventList.filter(event =>
     event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     event.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    event.category.some(cat => cat.toLowerCase().includes(searchQuery.toLowerCase()))
+    event.category.some(cat => cat.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    event.highlights.some(highlight => highlight.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const formatDate = (dateString) => {
@@ -47,12 +47,17 @@ const Events = () => {
 
   const EventTicket = ({ event }) => (
     <View style={styles.eventCard}>
+      {/* Left side - Image */}
       <View style={styles.eventImageContainer}>
         <Image source={{ uri: event.image }} style={styles.eventImage} />
+        <View style={styles.durationBadge}>
+          <Text style={styles.durationBadgeText}>{event.duration} Days</Text>
+        </View>
       </View>
       
+      {/* Right side - Content */}
       <View style={styles.eventContent}>
-        {/* Event Categories */}
+        {/* Categories */}
         <View style={styles.categoryContainer}>
           {event.category.slice(0, 2).map((category, index) => (
             <View key={index} style={styles.categoryBadge}>
@@ -61,57 +66,42 @@ const Events = () => {
           ))}
         </View>
 
-        {/* Event Title with Icon and Duration */}
-        <View style={styles.titleContainer}>
-          <Text style={styles.eventTitle}>
-            {event.name} {getDurationIcon(event.type)}
-          </Text>
-          <View style={styles.durationContainer}>
-            <Text style={styles.durationText}>{event.duration}</Text>
-            <Text style={styles.daysText}>
-              {event.duration === 1 ? 'Day' : 'Days'}
-            </Text>
-          </View>
+        {/* Title and Icon */}
+        <Text style={styles.eventTitle} numberOfLines={2}>
+          {event.name} {getDurationIcon(event.type)}
+        </Text>
+
+        {/* Location */}
+        <View style={styles.locationContainer}>
+          <Ionicons name="location-outline" size={14} color="#666" />
+          <Text style={styles.locationText} numberOfLines={1}>{event.location}</Text>
         </View>
 
-        {/* Event Location */}
-        <Text style={styles.locationText}>{event.location}</Text>
-
-        {/* Event Highlights */}
+        {/* Highlights - Show only 2 in horizontal layout */}
         <View style={styles.highlightsContainer}>
-          {event.highlights.slice(0, 4).map((highlight, index) => (
+          {event.highlights.slice(0, 2).map((highlight, index) => (
             <View key={index} style={styles.highlightItem}>
-              {index === 0 && <Ionicons name="star" size={16} color="#666" />}
-              {index === 1 && <Ionicons name="people" size={16} color="#666" />}
-              {index === 2 && <Ionicons name="camera" size={16} color="#666" />}
-              {index === 3 && <Ionicons name="musical-notes" size={16} color="#666" />}
-              <Text style={styles.highlightText}>{highlight}</Text>
+              <View style={styles.highlightDot} />
+              <Text style={styles.highlightText} numberOfLines={1}>{highlight}</Text>
             </View>
           ))}
         </View>
 
-        {/* Pricing and Actions */}
-        <View style={styles.actionContainer}>
+        {/* Bottom section - Price and Actions */}
+        <View style={styles.bottomSection}>
           <View style={styles.priceContainer}>
-            <Text style={styles.priceLabel}>Entry Fee</Text>
+            <Text style={styles.priceLabel}>From</Text>
             <Text style={styles.priceValue}>{event.ticketPrice}</Text>
           </View>
           
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.detailsButton}>
-              <Text style={styles.detailsButtonText}>View Details</Text>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity style={styles.whatsappButton}>
+              <Ionicons name="logo-whatsapp" size={18} color="#25D366" />
             </TouchableOpacity>
             
-            <View style={styles.contactButtons}>
-              <TouchableOpacity style={styles.enquireButton}>
-                <Ionicons name="mail" size={16} color="#fff" />
-                <Text style={styles.enquireText}>Enquire Now</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity style={styles.whatsappButton}>
-                <Ionicons name="logo-whatsapp" size={20} color="#25D366" />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={styles.enquireButton}>
+              <Text style={styles.enquireText}>Enquire</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -121,6 +111,15 @@ const Events = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Search Results Info */}
+        {searchQuery.length > 0 && (
+          <View style={styles.searchResultsInfo}>
+            <Text style={styles.searchResultsText}>
+              {filteredEvents.length} results for "{searchQuery}"
+            </Text>
+          </View>
+        )}
+
         {/* Events List */}
         <View style={styles.eventsContainer}>
           {filteredEvents.map((event) => (
@@ -132,11 +131,14 @@ const Events = () => {
         {filteredEvents.length === 0 && (
           <View style={styles.noResultsContainer}>
             <Ionicons name="calendar-outline" size={80} color="#ccc" />
-            <Text style={styles.noResultsText}>No events found</Text>
-            <Text style={styles.noResultsSubtext}>Try adjusting your search terms</Text>
+            <Text style={styles.noResultsText}>
+              {searchQuery.length > 0 ? 'No events found' : 'No events available'}
+            </Text>
+            <Text style={styles.noResultsSubtext}>
+              {searchQuery.length > 0 ? 'Try adjusting your search terms' : 'Check back later for upcoming events'}
+            </Text>
           </View>
         )}
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -147,175 +149,130 @@ export default Events;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 10,
     paddingBottom: 100,
-    backgroundColor: '#f5f5f5',
   },
-  header: {
-    marginTop: 10,
-    marginBottom: 30,
-    paddingHorizontal: 20,
-  },
-  navigationTabs: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    marginBottom: 30,
+  searchResultsInfo: {
     paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 10,
   },
-  activeTab: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  inactiveTab: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  tabIconContainer: {
-    position: 'relative',
-    marginBottom: 8,
-    alignItems: 'center',
-  },
-  eventIcon: {
-    transform: [{ rotate: '15deg' }],
-  },
-  activeTabText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#333',
-  },
-  inactiveTabText: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#999',
-  },
-  searchButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 50,
-    paddingLeft: 20,
-    paddingRight: 10,
-    paddingVertical: 7,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-    gap: 12,
-  },
-  searchPlaceholder: {
-    fontSize: 16,
-    color: '#000',
-    fontWeight: '400',
-    flex: 1,
-  },
-  filterButton: {
-    width: 48,
-    height: 48,
-    backgroundColor: "#333",
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
+  searchResultsText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '500',
   },
   eventsContainer: {
+    paddingTop: 8,
     paddingHorizontal: 10,
   },
   eventCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    marginBottom: 20,
+    flexDirection: 'row',
+    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.08,
+    elevation: 6,
     overflow: 'hidden',
+    minHeight: 160,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EBEBEB",
   },
   eventImageContainer: {
-    width: '100%',
-    height: 200,
+    width: 130,
+    height: 180,
+    position: 'relative',
   },
   eventImage: {
     width: '100%',
     height: '100%',
+    borderRadius: 30,
     resizeMode: 'cover',
   },
+  durationBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: 'rgba(0,0,0,0.75)',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backdropFilter: 'blur(10px)',
+  },
+  durationBadgeText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '600',
+  },
   eventContent: {
-    padding: 20,
+    flex: 1,
+    padding: 16,
+    justifyContent: 'space-between',
   },
   categoryContainer: {
     flexDirection: 'row',
-    marginBottom: 12,
-    gap: 8,
+    marginBottom: 10,
+    gap: 6,
   },
   categoryBadge: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: '#f8f9ff',
+    borderColor: '#e1e7ff',
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
   },
   categoryText: {
-    fontSize: 11,
-    color: '#666',
-    fontWeight: '500',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
+    fontSize: 10,
+    color: '#4f46e5',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   eventTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
-    flex: 1,
-    marginRight: 10,
-  },
-  durationContainer: {
-    alignItems: 'center',
-  },
-  durationText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: '700',
+    color: '#1a1a1a',
+    lineHeight: 22,
+    marginBottom: 8,
   },
-  daysText: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 2,
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   locationText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#666',
-    marginBottom: 15,
+    marginLeft: 4,
+    flex: 1,
   },
   highlightsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 20,
-    gap: 15,
+    marginBottom: 16,
+    gap: 6,
   },
   highlightItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
-    minWidth: '45%',
+  },
+  highlightDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#10b981',
+    marginRight: 8,
   },
   highlightText: {
     fontSize: 12,
-    color: '#666',
-    marginLeft: 6,
+    color: '#555',
     flex: 1,
   },
-  actionContainer: {
+  bottomSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 15,
+    paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
   },
@@ -323,55 +280,47 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   priceLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
+    fontSize: 11,
+    color: '#888',
+    marginBottom: 2,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   priceValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#1a1a1a',
   },
-  buttonContainer: {
-    alignItems: 'flex-end',
-    gap: 8,
-  },
-  detailsButton: {
-    backgroundColor: '#FF4757',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 25,
-  },
-  detailsButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  contactButtons: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  enquireButton: {
+  actionButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4A90E2',
+    gap: 8,
+  },
+  whatsappButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#f0fdf4',
+    borderColor: '#dcfce7',
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  enquireButton: {
+    backgroundColor: '#4f46e5',
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 6,
+    paddingVertical: 10,
+    borderRadius: 12,
+    shadowColor: '#4f46e5',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 4,
   },
   enquireText: {
     color: '#fff',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  whatsappButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    fontSize: 13,
+    fontWeight: '600',
   },
   noResultsContainer: {
     alignItems: 'center',
