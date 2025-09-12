@@ -2,12 +2,34 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from "react";
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, ScrollView, TextInput } from "react-native";
 import Monastery from '../../components/monastery';
+import Events from '../../components/events';
+import Packages from '../../components/events';
 
 // FONTS
 import BoldText from '@/assets/fonts/BoldText';
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("monastery");
+
+  // Handle tab press
+  const handleTabPress = (tabName) => {
+    setActiveTab(tabName);
+  };
+
+  // Render content based on active tab
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "monastery":
+        return <Monastery searchQuery={searchQuery} />;
+      case "events":
+        return <Events searchQuery={searchQuery} />;
+      case "packages":
+        return <Packages searchQuery={searchQuery} />;
+      default:
+        return <Monastery searchQuery={searchQuery} />;
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -16,27 +38,54 @@ const Index = () => {
         <View style={styles.header}>
           {/* Navigation Tabs */}
           <View style={styles.navigationTabs}>
-            <TouchableOpacity style={styles.activeTab}>
+            <TouchableOpacity 
+              style={activeTab === "monastery" ? styles.activeTab : styles.inactiveTab}
+              onPress={() => handleTabPress("monastery")}
+            >
               <View style={styles.tabIconContainer}>
-                <Ionicons name="home" size={30} color="#333" />
+                <Ionicons 
+                  name="home" 
+                  size={30} 
+                  color={activeTab === "monastery" ? "#333" : "#999"} 
+                />
               </View>
-              <Text style={styles.activeTabText}>Monastery</Text>
+              <Text style={activeTab === "monastery" ? styles.activeTabText : styles.inactiveTabText}>
+                Monastery
+              </Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.inactiveTab}>
+            <TouchableOpacity 
+              style={activeTab === "events" ? styles.activeTab : styles.inactiveTab}
+              onPress={() => handleTabPress("events")}
+            >
               <View style={styles.tabIconContainer}>
                 <View style={styles.eventIcon}>
-                  <Ionicons name="calendar" size={30} color="#999" />
+                  <Ionicons 
+                    name="calendar" 
+                    size={30} 
+                    color={activeTab === "events" ? "#333" : "#999"} 
+                  />
                 </View>
               </View>
-              <Text style={styles.inactiveTabText}>Events</Text>
+              <Text style={activeTab === "events" ? styles.activeTabText : styles.inactiveTabText}>
+                Events
+              </Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.inactiveTab}>
+            <TouchableOpacity 
+              style={activeTab === "packages" ? styles.activeTab : styles.inactiveTab}
+              onPress={() => handleTabPress("packages")}
+            >
               <View style={styles.tabIconContainer}>
-                <Ionicons name="car-sport" size={30} color="#999" />
+                <Ionicons 
+                  name="car-sport" 
+                  size={30} 
+                  color={activeTab === "packages" ? "#333" : "#999"} 
+                />
               </View>
-              <Text style={styles.inactiveTabText}>Packages</Text>
+              <Text style={activeTab === "packages" ? styles.activeTabText : styles.inactiveTabText}>
+                Packages
+              </Text>
             </TouchableOpacity>
           </View>
           
@@ -56,8 +105,8 @@ const Index = () => {
           </View>
         </View>
 
-        {/* Pass Search Query */}
-        <Monastery searchQuery={searchQuery} />
+        {/* Render Tab Content */}
+        {renderTabContent()}
 
       </ScrollView>
     </SafeAreaView>
@@ -140,5 +189,26 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     justifyContent: "center",
     alignItems: "center",
+  },
+  // New styles for tab content
+  tabContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 100,
+    paddingHorizontal: 20,
+  },
+  tabContentText: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  tabContentSubText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });
