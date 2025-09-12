@@ -12,6 +12,24 @@ export default function RootLayout() {
         }}
       />
 
+      {/* Events Screen */}
+      <Stack.Screen
+        name="events"
+        options={{
+          headerShown: false,
+          animation: "none", // ✅ Events shows instantly
+        }}
+      />
+
+      {/* Packages Screen */}
+      <Stack.Screen
+        name="packages"
+        options={{
+          headerShown: false,
+          animation: "none", // ✅ Packages shows instantly
+        }}
+      />
+
       {/* Home Tabs Layout */}
       <Stack.Screen
         name="(tabs)"

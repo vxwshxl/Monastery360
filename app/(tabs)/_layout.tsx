@@ -1,6 +1,6 @@
-import React from 'react'
-import { Tabs } from 'expo-router'
 import { TabBar } from '@/components/TabBar'
+import { Tabs } from 'expo-router'
+import React from 'react'
 
 const TabLayout = () => {
   return (
@@ -13,6 +13,20 @@ const TabLayout = () => {
         name="index" 
         options={{ 
           title: 'Home',
+          tabBarGroup: 'left'
+        }} 
+      />
+      <Tabs.Screen 
+        name="events" 
+        options={{ 
+          title: 'Events',
+          tabBarGroup: 'left'
+        }} 
+      />
+      <Tabs.Screen 
+        name="packages" 
+        options={{ 
+          title: 'Packages',
           tabBarGroup: 'left'
         }} 
       />
