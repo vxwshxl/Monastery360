@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from "react";
 import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal, Animated, Image, Dimensions } from "react-native";
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import Events from '../../components/events';
 import Monastery from '../../components/monastery';
 import Packages from '../../components/packages';
@@ -15,6 +16,83 @@ const Index = () => {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [showMapModal, setShowMapModal] = useState(false);
   const [mapFadeAnim] = useState(new Animated.Value(0));
+
+  // Sikkim coordinates and boundaries
+  const sikkimRegion = {
+    latitude: 27.5330,
+    longitude: 88.5122,
+    latitudeDelta: 1.5,
+    longitudeDelta: 1.2,
+  };
+
+  // Major cities and monasteries in Sikkim
+  const sikkimLocations = [
+    {
+      id: 1,
+      title: "Gangtok (Capital)",
+      coordinate: { latitude: 27.3314, longitude: 88.6138 },
+      type: "capital",
+      description: "Capital city of Sikkim"
+    },
+    {
+      id: 2,
+      title: "Rumtek Monastery",
+      coordinate: { latitude: 27.2783, longitude: 88.5500 },
+      type: "monastery",
+      description: "Famous Buddhist monastery"
+    },
+    {
+      id: 3,
+      title: "Pelling",
+      coordinate: { latitude: 27.2167, longitude: 88.2167 },
+      type: "town",
+      description: "Tourist destination with mountain views"
+    },
+    {
+      id: 4,
+      title: "Yuksom",
+      coordinate: { latitude: 27.3667, longitude: 88.2167 },
+      type: "town",
+      description: "Historic first capital of Sikkim"
+    },
+    {
+      id: 5,
+      title: "Namchi",
+      coordinate: { latitude: 27.1667, longitude: 88.3667 },
+      type: "town",
+      description: "Sky High statue location"
+    },
+    {
+      id: 6,
+      title: "Lachung",
+      coordinate: { latitude: 27.7000, longitude: 88.7333 },
+      type: "town",
+      description: "Mountain village in North Sikkim"
+    },
+    {
+      id: 7,
+      title: "Nathu La Pass",
+      coordinate: { latitude: 27.3917, longitude: 88.8417 },
+      type: "pass",
+      description: "Mountain pass on India-China border"
+    },
+    {
+      id: 8,
+      title: "Tsomgo Lake",
+      coordinate: { latitude: 27.4000, longitude: 88.7583 },
+      type: "lake",
+      description: "Sacred glacial lake"
+    }
+  ];
+
+  // Sikkim state boundary (approximate polygon)
+  const sikkimBoundary = [
+    { latitude: 28.1280, longitude: 88.0625 },
+    { latitude: 28.1280, longitude: 88.9167 },
+    { latitude: 27.0417, longitude: 88.9167 },
+    { latitude: 27.0417, longitude: 88.0625 },
+    { latitude: 28.1280, longitude: 88.0625 }
+  ];
 
   // Language options
   const languages = [
@@ -44,7 +122,6 @@ const Index = () => {
   const handleLanguageSelect = (language) => {
     setSelectedLanguage(language.name);
     closeLanguageFilter();
-    // Here you can add logic to change app language or filter content
     console.log(`Language changed to: ${language.name}`);
   };
 
@@ -82,10 +159,21 @@ const Index = () => {
 
   // Handle download map button press
   const handleDownloadMap = () => {
-    // Add your download logic here
     console.log("Downloading Sikkim map...");
-    // You can add actual download functionality here
+    // Add actual download functionality here
     closeMapModal();
+  };
+
+  // Get marker color based on location type
+  const getMarkerColor = (type) => {
+    switch (type) {
+      case 'capital': return '#FF6B6B';
+      case 'monastery': return '#4ECDC4';
+      case 'town': return '#45B7D1';
+      case 'pass': return '#96CEB4';
+      case 'lake': return '#FECA57';
+      default: return '#74B9FF';
+    }
   };
 
   // Render content based on active tab
@@ -277,27 +365,90 @@ const Index = () => {
               ]}
             >
               <View style={styles.mapModalHeader}>
-                <Text style={styles.mapModalTitle}>Sikkim Map</Text>
+                <Text style={styles.mapModalTitle}>Sikkim Interactive Map</Text>
                 <TouchableOpacity onPress={closeMapModal}>
                   <Ionicons name="close" size={24} color="#666" />
                 </TouchableOpacity>
               </View>
               
-              {/* Map Image Container */}
+              {/* Interactive Map Container */}
               <View style={styles.mapContainer}>
-                <View style={styles.mapPlaceholder}>
-                  <Ionicons name="map" size={80} color="#999" />
-                  <Text style={styles.mapPlaceholderText}>Map of Sikkim</Text>
-                  <Text style={styles.mapPlaceholderSubtext}>
-                    Detailed map showing all districts, monasteries, and tourist attractions
-                  </Text>
+                <MapView
+                  style={styles.map}
+                  initialRegion={sikkimRegion}
+                  mapType="terrain"
+                  showsUserLocation={false}
+                  showsMyLocationButton={false}
+                  scrollEnabled={true}
+                  zoomEnabled={true}
+                  pitchEnabled={false}
+                  rotateEnabled={false}
+                >
+                  {/* Sikkim State Boundary */}
+                  <Polyline
+                    coordinates={sikkimBoundary}
+                    strokeColor="#29292B"
+                    strokeWidth={3}
+                    lineDashPattern={[10, 5]}
+                  />
+
+                  {/* Location Markers */}
+                  {sikkimLocations.map((location) => (
+                    <Marker
+                      key={location.id}
+                      coordinate={location.coordinate}
+                      title={location.title}
+                      description={location.description}
+                      pinColor={getMarkerColor(location.type)}
+                    >
+                      <View style={[styles.customMarker, { backgroundColor: getMarkerColor(location.type) }]}>
+                        <Ionicons 
+                          name={
+                            location.type === 'capital' ? 'star' :
+                            location.type === 'monastery' ? 'home' :
+                            location.type === 'pass' ? 'mountain' :
+                            location.type === 'lake' ? 'water' : 'location'
+                          } 
+                          size={16} 
+                          color="#fff" 
+                        />
+                      </View>
+                    </Marker>
+                  ))}
+                </MapView>
+              </View>
+              
+              {/* Map Legend */}
+              <View style={styles.mapLegend}>
+                <Text style={styles.legendTitle}>Map Legend</Text>
+                <View style={styles.legendItems}>
+                  <View style={styles.legendItem}>
+                    <View style={[styles.legendColor, { backgroundColor: '#FF6B6B' }]} />
+                    <Text style={styles.legendText}>Capital</Text>
+                  </View>
+                  <View style={styles.legendItem}>
+                    <View style={[styles.legendColor, { backgroundColor: '#4ECDC4' }]} />
+                    <Text style={styles.legendText}>Monastery</Text>
+                  </View>
+                  <View style={styles.legendItem}>
+                    <View style={[styles.legendColor, { backgroundColor: '#45B7D1' }]} />
+                    <Text style={styles.legendText}>Town</Text>
+                  </View>
+                  <View style={styles.legendItem}>
+                    <View style={[styles.legendColor, { backgroundColor: '#96CEB4' }]} />
+                    <Text style={styles.legendText}>Pass</Text>
+                  </View>
+                  <View style={styles.legendItem}>
+                    <View style={[styles.legendColor, { backgroundColor: '#FECA57' }]} />
+                    <Text style={styles.legendText}>Lake</Text>
+                  </View>
                 </View>
               </View>
               
               {/* Download Button */}
               <TouchableOpacity style={styles.downloadMapButton} onPress={handleDownloadMap}>
                 <Ionicons name="download" size={20} color="#fff" style={{ marginRight: 8 }} />
-                <Text style={styles.downloadMapButtonText}>Download Map</Text>
+                <Text style={styles.downloadMapButtonText}>Download Offline Map</Text>
               </TouchableOpacity>
             </Animated.View>
           </TouchableOpacity>
@@ -512,7 +663,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     width: '95%',
     maxWidth: 400,
-    maxHeight: height * 0.8,
+    maxHeight: height * 0.85,
     borderRadius: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
@@ -535,32 +686,63 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   mapContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    minHeight: 300,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+    height: 300,
   },
-  mapPlaceholder: {
-    flex: 1,
+  map: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  customMarker: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    padding: 40,
-    minHeight: 300,
+    borderWidth: 2,
+    borderColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  mapPlaceholderText: {
-    fontSize: 18,
+  mapLegend: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  legendTitle: {
+    fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginTop: 16,
-    marginBottom: 8,
+    marginBottom: 10,
   },
-  mapPlaceholderSubtext: {
-    fontSize: 14,
+  legendItems: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 15,
+    marginBottom: 5,
+  },
+  legendColor: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 6,
+  },
+  legendText: {
+    fontSize: 12,
     color: '#666',
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 20,
+    fontWeight: '500',
   },
   downloadMapButton: {
     flexDirection: 'row',
